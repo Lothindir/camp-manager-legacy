@@ -16,7 +16,8 @@ protocol.registerSchemesAsPrivileged([{scheme: 'app', privileges: { secure: true
 
 function createWindow () {
   // Create the browser window.
-  win = new BrowserWindow({ backgroundColor: '#1a202c',icon: 'src/assets/tent.ico', frame: true, title: 'Camp Manager', width: 1200, height: 675, webPreferences: {
+  win = new BrowserWindow({ backgroundColor: '#1a202c',icon: 'src/assets/tent.ico', frame: false, title: 'Camp' +
+        ' Manager', width: 1200, height: 675, webPreferences: {
     nodeIntegration: true
   }, show: false });
 

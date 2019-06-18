@@ -9,6 +9,10 @@
     }
 }
 
+.titlebar-svg{
+    @apply w-6 h-4 fill-current text-gray-500 ml-1 mr-1;
+}
+
 .clickable {
     -webkit-app-region: no-drag;
 }
