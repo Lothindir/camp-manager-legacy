@@ -1,5 +1,6 @@
 # Camp Manager
 This project aims to create a utility app to manage scout camps, it's made with Vue.js, Electron and TailwindCSS.
+https://travis-ci.org/Lothindir/camp-manager.svg?branch=master
 
 ## Project setup
 ```
