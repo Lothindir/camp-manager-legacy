@@ -21,7 +21,7 @@
 
 <script>
     import '../icons/zondicons'
-    const {remote} = require('electron');
+    const {remote} = window.require('electron');
 
     export default {
         name: "Titlebar",

@@ -1,5 +1,8 @@
 <template>
-    <div v-bind:class="(isOpen ? 'w-56' : 'w-12')" v-on:focusout="isOpen = false" class="bg-gray-800 text-white border-r border-b border-black fixed min-h-screen pt-8 top-0 z-40">
+    <div v-bind:class="(isOpen ? 'w-56' : 'w-12')" class="bg-gray-800 text-white border-r border-b border-black fixed min-h-screen pt-8 top-0 z-40">
+        <div v-if="isOpen" class="w-full px-3 pt-3 flex items-end" v-on:click="isOpen = false">
+            <svgicon class="text-right" icon="zondicons/arrow-thin-left"></svgicon>
+        </div>
         <div v-if="isOpen" class="search-container text-center p-3 relative">
             <input class="bg-gray-600 text-gray-100 text-xs w-full p-2 pl-8 border-gray-700 rounded" placeholder="Search" type="text">
             <div class="absolute top-0 py-5 px-2 text-grey-100">
