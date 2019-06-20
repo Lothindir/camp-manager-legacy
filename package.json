@@ -1,5 +1,7 @@
 {
   "name": "camp-manager",
+  "description": "A camp manager made with Vue.js, Electron & TailwindCSS",
+  "author": "Francesco Monti",
   "version": "0.1.0",
   "private": true,
   "scripts": {
