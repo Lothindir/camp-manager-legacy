@@ -1,4 +1,5 @@
 # Camp Manager
+This project aims to create a utility app to manage scout camps, it's made with Vue.js, Electron and TailwindCSS.
 
 ## Project setup
 ```
@@ -6,18 +7,23 @@ npm install
 ```
 
 ### Compiles and hot-reloads for development
+#### Web App
 ```
 npm run serve
 ```
+#### Electron App
+```
+npm run electron:serve
+```
 
 ### Compiles and minifies for production
+#### Web App
 ```
 npm run build
 ```
-
-### Run your tests
+#### Electron App
 ```
-npm run test
+npm run electron:build
 ```
 
 ### Lints and fixes files
