@@ -1,6 +1,6 @@
 'use strict';
 
-import { app, protocol, BrowserWindow } from 'electron'
+import { app, protocol, BrowserWindow, ipcMain } from 'electron'
 import {
     createProtocol,
     installVueDevtools
@@ -88,3 +88,14 @@ if (isDevelopment) {
         })
     }
 }
+
+let events = [];
+
+ipcMain.on('async-new-event', (event, arg) => {
+    console.log('Args:' + JSON.stringify(arg));
+    events.push(arg);
+});
+
+ipcMain.on('async-request-all-events', (event, arg) => {
+    event.reply('async-response-all-events', events);
+});

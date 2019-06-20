@@ -43,6 +43,8 @@
     import interactionPlugin, { Draggable } from '@fullcalendar/interaction';
     import frLocale from '../assets/js/cm-fr'
 
+    const { ipcRenderer } = require('electron');
+
     export default {
         name: 'home',
         directives: {
@@ -101,11 +103,19 @@
             this.$nextTick(() => {
                 this.calendar = this.$refs.calendar.getApi();
 
+                ipcRenderer.on('async-response-all-events', (event, arg) => {
+                    for(event of arg){
+                        this.calendar.addEvent(event);
+                    }
+                });
+
                 /*   Makes all the default events draggable in the calendar   */
                 let container = document.getElementById('defaultEventsContainer');
                 new Draggable(container, {
                     itemSelector: '.draggable-event'
                 });
+
+                ipcRenderer.send('async-request-all-events');
             });
         },
         methods: {
@@ -138,8 +148,9 @@
             },
             /* Creates a new event from the selection data */
             newEvent: function (eventInfo) {
+                let event = {};
                 if(this.selectionInfo !== null){
-                    this.calendar.addEvent({
+                    event = {
                         start: this.selectionInfo.start,
                         end: this.selectionInfo.end,
                         title: 'New event',
@@ -147,10 +158,10 @@
                         extendedProps: {
                             resp: ['FM', 'KM']
                         }
-                    });
+                    };
                 }
                 else if(eventInfo !== undefined){
-                    this.calendar.addEvent({
+                    event = {
                         start: eventInfo.start,
                         title: eventInfo.title,
                         color: eventInfo.color,
@@ -158,8 +169,11 @@
                         extendedProps: {
                             resp: ['FM', 'KM']
                         }
-                    });
+                    };
                 }
+                this.calendar.addEvent(event);
+
+                ipcRenderer.send('async-new-event', event);
             },
             /* Get the data-event of the corresponding defaultEvent */
             getEventData: function (title) {
