@@ -9,15 +9,29 @@
     }
 }
 
-.titlebar-svg{
-    @apply w-6 h-4 fill-current text-gray-500 ml-1 mr-1;
+.btn-titlebar {
+    @apply h-full flex items-center;
+    -webkit-app-region: no-drag;
+}
+
+.btn-titlebar:hover {
+    @apply bg-gray-700;
 }
 
 .clickable {
     -webkit-app-region: no-drag;
 }
 
+.router-link-exact-active {
+    @apply bg-gray-700;
+}
+
+router-link {
+    @apply w-full;
+}
+
 ::-webkit-scrollbar {
+    top: 8rem;
     width: 12px;
     background-color: rgba(0, 0, 0, 0.82);
 }
