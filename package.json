@@ -24,6 +24,7 @@
     "core-js": "^2.6.5",
     "mongodb": "^3.2.7",
     "vue": "^2.6.10",
+    "vue-multiselect": "^2.1.6",
     "vue-resize-directive": "^1.2.0",
     "vue-router": "^3.0.3",
     "vuex": "^3.0.1"
