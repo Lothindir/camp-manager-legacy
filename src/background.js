@@ -21,7 +21,7 @@ function createWindow () {
             nodeIntegration: true
         }, show: false });
 
-    win.setMinimumSize(800, 475);
+    win.setMinimumSize(800, 500);
 
     if (process.env.WEBPACK_DEV_SERVER_URL) {
         // Load the url of the dev server if in development mode
@@ -96,6 +96,6 @@ ipcMain.on('async-new-event', (event, arg) => {
     events.push(arg);
 });
 
-ipcMain.on('async-request-all-events', (event, arg) => {
+ipcMain.on('async-request-all-events', (event) => {
     event.reply('async-response-all-events', events);
 });
