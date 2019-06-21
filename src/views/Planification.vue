@@ -19,6 +19,7 @@
                       editable="true"
                       selectable="true"
                       droppable="true"
+                      event-limit="true"
                       v-on:select="selectionChanged"
                       v-on:dateClick="dateChanged"
                       :slot-label-format="slotLabelFormat"
@@ -30,7 +31,9 @@
                       :views="{
                         weekTimeGridView
                         }"
+                      class="z-10"
         />
+        <AddEventModal ref="addEventModal" v-show="showModal" v-on:close="showModal = false"></AddEventModal>
     </div>
 </template>
 
@@ -41,9 +44,11 @@
     import dayGridPlugin from '@fullcalendar/daygrid';
     import timeGridPlugin from '@fullcalendar/timegrid';
     import interactionPlugin, { Draggable } from '@fullcalendar/interaction';
-    import frLocale from '../assets/js/cm-fr'
+    import frLocale from '../assets/js/cm-fr';
+    import AddEventModal from "../components/AddEventModal";
 
     const { ipcRenderer } = require('electron');
+
 
     export default {
         name: 'home',
@@ -51,6 +56,7 @@
             resize
         },
         components: {
+            AddEventModal,
             FullCalendar
         },
         data() {
@@ -72,7 +78,7 @@
                 customButtons: {
                     addEventButton: {
                         text: "Nouvelle activité",
-                        click: this.newEvent
+                        click: this.showModalDialog
                     }
                 },
                 selectionInfo: null,
@@ -139,12 +145,25 @@
             /* Stores the current selected dateTime */
             dateChanged: function(dateInfo) {
                 this.selectionInfo = null;
-                this.newEvent({
+                this.showModalDialog({
                     start: dateInfo.date,
                     title: 'New event',
                     color: 'red',
                     allDay: dateInfo.allDay
                 });
+            },
+            showModalDialog: function(eventInfo){
+                this.showModal = true;
+                this.$refs.addEventModal.$once('submit', () => {
+                    console.log('Modal submitted data');
+                    this.showModal = false;
+                    this.newEvent(eventInfo);
+                });
+            },
+            clearModalDialog: function(){
+                this.showModal = false;
+                this.selectionInfo = null;
+                this.selectedDate = null;
             },
             /* Creates a new event from the selection data */
             newEvent: function (eventInfo) {
