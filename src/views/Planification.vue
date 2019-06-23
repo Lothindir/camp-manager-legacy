@@ -2,7 +2,7 @@
     <div ref="container" class="flex flex-1 items-start align-middle ml-12 px-8 pt-4 bg-gray-600 text-gray-800">
         <div id="defaultEventsContainer" ref="defaultEventsContainer" class="border border-black bg-gray-600 mr-3 mt-20 p-1 h-auto">
             <h1>Activités de base</h1>
-            <div v-for="defaultEvent in defaultEvents" class='draggable-event fc-event p-1 my-1' :data-event="getEventData(defaultEvent.title)" :key="defaultEvent.title">{{defaultEvent.title}}</div>
+            <div v-for="defaultEvent in defaultEvents" class='draggable-event fc-event p-1 my-1' :style="getEventBackgroundColor(defaultEvent.title)" :data-event="getEventData(defaultEvent.title)" :key="defaultEvent.title">{{defaultEvent.title}}</div>
         </div>
         <FullCalendar id="calendar" ref="calendar"
                       v-resize="changeCalendarHeight"
@@ -20,6 +20,8 @@
                       selectable="true"
                       droppable="true"
                       event-limit="true"
+                      slot-duration="00:15:00"
+                      force-event-duration="true"
                       v-on:select="selectionChanged"
                       v-on:dateClick="dateChanged"
                       v-on:eventReceive="eventDropped"
@@ -94,12 +96,24 @@
                 showModal: false,
                 defaultEvents: [
                     {
+                        title: "Diane",
+                        duration: {minutes: 15},
+                        color: "RoyalBlue"
+                    },
+                    {
                         title: "Repas",
-                        duration: {minutes: 60}
+                        duration: {minutes: 60},
+                        color: "IndianRed",
+                    },
+                    {
+                        title: "Shhhhh'Time",
+                        duration: {minutes: 30},
+                        color: "LightCoral"
                     },
                     {
                         title: "TAPS",
-                        duration: {minutes: 30}
+                        duration: {minutes: 30},
+                        color: "MidnightBlue"
                     }
                 ]
             }
@@ -152,17 +166,16 @@
                 this.selectionInfo = null;
                 this.showModalDialog({
                     start: dateInfo.date,
-                    title: 'New event',
+                    title: 'New click',
                     color: 'red',
                     allDay: dateInfo.allDay
                 });
-            }
+            },
             /* Stores the current selected dateTime */
-,
             eventDropped: function(info){
                 this.selectionInfo = null;
                 this.selectedDate = null;
-                console.log(info.event);
+
                 ipcRenderer.send('async-new-event', this.normalizeEventObject(info.event));
             },
             updateEventPosition: function(eventDropInfo){
@@ -201,9 +214,10 @@
                 if(this.selectionInfo !== null){
                     console.log('Adding selection event');
                     event = {
+                        allDay: this.selectionInfo.allDay,
                         start: this.selectionInfo.start,
                         end: this.selectionInfo.end,
-                        title: 'New event',
+                        title: 'New button',
                         color: 'blue',
                         extendedProps: {
                             resp: ['FM', 'KM']
@@ -223,18 +237,20 @@
                         }
                     };
                 }
-                this.calendar.addEvent(event);
+                let generatedEvent = this.calendar.addEvent(event);
+                console.log(event);
+                console.log(generatedEvent);
 
-                ipcRenderer.send('async-new-event', event);
+                ipcRenderer.send('async-new-event', this.normalizeEventObject(generatedEvent));
             },
             /* Get the data-event of the corresponding defaultEvent */
             getEventData: function (title) {
                 let defaultEvent = this.defaultEvents.find(e => e.title === title);
-                let eventData = {
-                    title: title,
-                    duration: defaultEvent.duration
-                };
-                return JSON.stringify(eventData);
+                return JSON.stringify(defaultEvent);
+            },
+            getEventBackgroundColor: function(title){
+                let defaultEvent = this.defaultEvents.find(e => e.title === title);
+                return 'background-color: ' + defaultEvent.color + '; border-color: ' + defaultEvent.color + ';';
             },
             normalizeEventObject: function (EventObject) {
                 return {
@@ -242,7 +258,8 @@
                     end: EventObject.end,
                     title: EventObject.title,
                     allDay: EventObject.allDay,
-                    color: EventObject.color,
+                    backgroundColor: EventObject.backgroundColor !== undefined ? EventObject.backgroundColor : EventObject.color,
+                    borderColor: EventObject.borderColor !== undefined ? EventObject.borderColor : EventObject.color,
                     extendedProps: EventObject.extendedProps
                 };
             }
