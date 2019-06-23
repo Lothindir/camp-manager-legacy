@@ -94,8 +94,23 @@ let events = [];
 ipcMain.on('async-new-event', (event, arg) => {
     console.log('Args:' + JSON.stringify(arg));
     events.push(arg);
+    console.log(events);
 });
 
 ipcMain.on('async-request-all-events', (event) => {
     event.reply('async-response-all-events', events);
+});
+
+ipcMain.on('async-clear-all-events', () => {
+   events = [];
+   console.log('Cleared all events');
+});
+
+ipcMain.on('async-replace-event', (sentEvents) => {
+    console.log('SentEvents: ' + Object.keys(sentEvents));
+    console.log('Old: ' + sentEvents.old);
+    console.log('New: ' + sentEvents.new);
+   events.splice(events.indexOf(sentEvents.old), 1);
+   events.push(sentEvents.new);
+    console.log(events);
 });
