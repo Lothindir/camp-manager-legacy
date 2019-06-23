@@ -3,7 +3,13 @@
   "description": "A camp manager made with Vue.js, Electron & TailwindCSS",
   "author": "Francesco Monti",
   "version": "0.1.6",
-  "private": true,
+  "license": "MIT",
+  "bugs": "https://github.com/Lothindir/camp-manager/issues",
+  "repository": {
+    "type" : "git",
+    "url" : "https://github.com/Lothindir/camp-manager.git"
+  },
+  "private": false,
   "scripts": {
     "serve": "vue-cli-service serve",
     "build": "vue-cli-service build",
@@ -22,7 +28,7 @@
     "@fullcalendar/timegrid": "^4.2.0",
     "@fullcalendar/vue": "^4.2.2",
     "core-js": "^2.6.5",
-    "mongodb": "^3.2.7",
+    "nedb": "^1.8.0",
     "vue": "^2.6.10",
     "vue-multiselect": "^2.1.6",
     "vue-resize-directive": "^1.2.0",
