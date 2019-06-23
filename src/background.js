@@ -94,22 +94,35 @@ if (isDevelopment) {
 }
 
 ipcMain.on('async-new-event', (e, newEvent) => {
+    console.log('Inserting event :' + Object.entries(newEvent));
     eventsDatabase.insert(newEvent);
 });
 
 ipcMain.on('async-request-all-events', (event) => {
+    console.log('Requesting all events');
     eventsDatabase.find({}, function (err, docs) {
         event.reply('async-response-all-events', docs);
     });
 });
 
 ipcMain.on('async-clear-all-events', () => {
+    console.log('Clearing all events');
     eventsDatabase.remove({}, { multi: true });
 });
 
 ipcMain.on('async-replace-event', (e, sentEvents) => {
+    console.log('Replacing events');
+
     eventsDatabase.findOne(sentEvents.old, function (err, docs) {
-        eventsDatabase.remove(docs);
+        if(err === null) {
+            if (docs === null) {
+                console.log(Object.entries(sentEvents.old));
+            } else {
+                eventsDatabase.remove(docs, {});
+                eventsDatabase.insert(sentEvents.new);
+            }
+        }
+        else
+            console.log(err);
     });
-    eventsDatabase.insert(sentEvents.new);
 });
