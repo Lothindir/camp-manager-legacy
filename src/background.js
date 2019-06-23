@@ -1,11 +1,14 @@
 'use strict';
 
-import { app, protocol, BrowserWindow, ipcMain } from 'electron'
+import { app, protocol, BrowserWindow, ipcMain } from 'electron';
 import {
     createProtocol,
     installVueDevtools
-} from 'vue-cli-plugin-electron-builder/lib'
+} from 'vue-cli-plugin-electron-builder/lib';
 const isDevelopment = process.env.NODE_ENV !== 'production';
+
+let Datastore = require('nedb');
+let eventsDatabase = new Datastore({ filename: 'src/assets/database/events.db' });
 
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.
@@ -68,10 +71,11 @@ app.on('ready', async () => {
         try {
             await installVueDevtools()
         } catch (e) {
-            console.error('Vue Devtools failed to install:', e.toString())
+            console.error('Vue Devtools failed to install:', e.toString());
         }
     }
-    createWindow()
+    createWindow();
+    eventsDatabase.loadDatabase();
 });
 
 // Exit cleanly on request from parent process in development mode.
@@ -89,28 +93,23 @@ if (isDevelopment) {
     }
 }
 
-let events = [];
-
-ipcMain.on('async-new-event', (event, arg) => {
-    console.log('Args:' + JSON.stringify(arg));
-    events.push(arg);
-    console.log(events);
+ipcMain.on('async-new-event', (e, newEvent) => {
+    eventsDatabase.insert(newEvent);
 });
 
 ipcMain.on('async-request-all-events', (event) => {
-    event.reply('async-response-all-events', events);
+    eventsDatabase.find({}, function (err, docs) {
+        event.reply('async-response-all-events', docs);
+    });
 });
 
 ipcMain.on('async-clear-all-events', () => {
-   events = [];
-   console.log('Cleared all events');
+    eventsDatabase.remove({}, { multi: true });
 });
 
-ipcMain.on('async-replace-event', (sentEvents) => {
-    console.log('SentEvents: ' + Object.keys(sentEvents));
-    console.log('Old: ' + sentEvents.old);
-    console.log('New: ' + sentEvents.new);
-   events.splice(events.indexOf(sentEvents.old), 1);
-   events.push(sentEvents.new);
-    console.log(events);
+ipcMain.on('async-replace-event', (e, sentEvents) => {
+    eventsDatabase.findOne(sentEvents.old, function (err, docs) {
+        eventsDatabase.remove(docs);
+    });
+    eventsDatabase.insert(sentEvents.new);
 });
