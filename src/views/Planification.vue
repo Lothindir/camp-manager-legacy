@@ -22,10 +22,13 @@
                       event-limit="true"
                       v-on:select="selectionChanged"
                       v-on:dateClick="dateChanged"
+                      v-on:eventReceive="eventDropped"
+                      v-on:eventDrop="updateEventPosition"
+                      v-on:eventResize="updateEventDuration"
                       :slot-label-format="slotLabelFormat"
                       :custom-buttons="customButtons"
                       :header="{
-                        center: 'addEventButton',
+                        center: 'addEventButton, clearAllEvents',
                         right: 'weekTimeGridView, timeGridDay'
                         }"
                       :views="{
@@ -79,6 +82,10 @@
                     addEventButton: {
                         text: "Nouvelle activité",
                         click: this.showModalDialog
+                    },
+                    clearAllEvents: {
+                        text: "Effacer tout",
+                        click: this.clearAllEvents
                     }
                 },
                 selectionInfo: null,
@@ -109,8 +116,8 @@
             this.$nextTick(() => {
                 this.calendar = this.$refs.calendar.getApi();
 
-                ipcRenderer.on('async-response-all-events', (event, arg) => {
-                    for(event of arg){
+                ipcRenderer.on('async-response-all-events', (ev, arg) => {
+                    for(let event of arg){
                         this.calendar.addEvent(event);
                     }
                 });
@@ -141,9 +148,7 @@
             /* Stores the current selection */
             selectionChanged: function (selectionInfo) {
                 this.selectionInfo = selectionInfo;
-            },
-            /* Stores the current selected dateTime */
-            dateChanged: function(dateInfo) {
+            },            dateChanged: function(dateInfo) {
                 this.selectionInfo = null;
                 this.showModalDialog({
                     start: dateInfo.date,
@@ -151,6 +156,23 @@
                     color: 'red',
                     allDay: dateInfo.allDay
                 });
+            }
+            /* Stores the current selected dateTime */
+,
+            eventDropped: function(info){
+                this.selectionInfo = null;
+                this.selectedDate = null;
+                console.log(info.event);
+                ipcRenderer.send('async-new-event', this.normalizeEventObject(info.event));
+            },
+            updateEventPosition: function(eventDropInfo){
+                console.log(this.normalizeEventObject(eventDropInfo.oldEvent));
+                ipcRenderer.send('async-replace-event', { old: this.normalizeEventObject(eventDropInfo.oldEvent), new: this.normalizeEventObject(eventDropInfo.event)});
+                console.log('Sent moved event');
+            },
+            updateEventDuration: function(eventResizeInfo){
+                ipcRenderer.send('async-replace-event', { old: this.normalizeEventObject(eventResizeInfo.prevEvent), new: this.normalizeEventObject(eventResizeInfo.event)});
+                console.log('Sent resized event');
             },
             showModalDialog: function(eventInfo){
                 this.showModal = true;
@@ -165,10 +187,19 @@
                 this.selectionInfo = null;
                 this.selectedDate = null;
             },
+            clearAllEvents: function(){
+                if(this.calendar !== undefined) {
+                    if(this.calendar.getEvents() !== undefined) {
+                        this.calendar.getEvents().forEach(e => e.remove());
+                        ipcRenderer.send('async-clear-all-events');
+                    }
+                }
+            },
             /* Creates a new event from the selection data */
             newEvent: function (eventInfo) {
                 let event = {};
                 if(this.selectionInfo !== null){
+                    console.log('Adding selection event');
                     event = {
                         start: this.selectionInfo.start,
                         end: this.selectionInfo.end,
@@ -180,8 +211,10 @@
                     };
                 }
                 else if(eventInfo !== undefined){
+                    console.log('Adding eventInfo');
                     event = {
                         start: eventInfo.start,
+                        end: eventInfo.end,
                         title: eventInfo.title,
                         color: eventInfo.color,
                         allDay: eventInfo.allDay,
@@ -202,6 +235,16 @@
                     duration: defaultEvent.duration
                 };
                 return JSON.stringify(eventData);
+            },
+            normalizeEventObject: function (EventObject) {
+                return {
+                    start: EventObject.start,
+                    end: EventObject.end,
+                    title: EventObject.title,
+                    allDay: EventObject.allDay,
+                    color: EventObject.color,
+                    extendedProps: EventObject.extendedProps
+                };
             }
         }
     }
