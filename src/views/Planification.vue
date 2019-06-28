@@ -54,7 +54,7 @@
                         }"
                       class="z-10"
         />
-        <AddEventModal ref="addEventModal" v-show="showModal" v-on:close="showModal = false"></AddEventModal>
+        <AddEventModal ref="addEventModal" v-show="showModal" v-on:close="showModal = false" v-on:submit="addModalEvent"></AddEventModal>
     </div>
 </template>
 
@@ -185,7 +185,8 @@
             /* Stores the current selection */
             selectionChanged: function (selectionInfo) {
                 this.selectionInfo = selectionInfo;
-            },            dateChanged: function(dateInfo) {
+            },
+            dateChanged: function(dateInfo) {
                 this.selectionInfo = null;
                 this.showModalDialog({
                     start: dateInfo.date,
@@ -219,6 +220,9 @@
                         this.newEvent(eventInfo);
                     });
                 }
+            },
+            addModalEvent: function(event) {
+                //event.title;
             },
             clearModalDialog: function(){
                 this.showModal = false;
