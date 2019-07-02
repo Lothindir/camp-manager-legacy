@@ -6,8 +6,8 @@
   "license": "MIT",
   "bugs": "https://github.com/Lothindir/camp-manager/issues",
   "repository": {
-    "type" : "git",
-    "url" : "https://github.com/Lothindir/camp-manager.git"
+    "type": "git",
+    "url": "https://github.com/Lothindir/camp-manager.git"
   },
   "private": false,
   "scripts": {
