@@ -1,4 +1,8 @@
 appId: "com.electron.camp-manager"
 productName: "Camp Manager"
 win:
-  target: "nsis"
+  target:
+    - "nsis"
+nsis:
+  oneClick: false
+  allowToChangeInstallationDirectory: true
