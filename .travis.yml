@@ -1,6 +1,10 @@
 language: node_js
 node_js:
   - "10"
+branches:
+  only:
+    - master
+    - dev
 deploy:
   provider: releases
   skip_cleanup: true
