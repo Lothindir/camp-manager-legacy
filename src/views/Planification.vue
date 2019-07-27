@@ -37,6 +37,7 @@
                       droppable="true"
                       event-limit="true"
                       :slot-duration="slotDuration"
+                      :snap-duration="minSlotDuration"
                       force-event-duration="true"
                       v-on:select="selectionChanged"
                       v-on:dateClick="dateChanged"
@@ -117,6 +118,7 @@
                     { value: "01:00:00", text: "1 heure" }
                 ],
                 slotDuration: "00:30:00",
+                minSlotDuration: "00:15:00",
                 defaultEvents: [
                     {
                         title: "Diane",
