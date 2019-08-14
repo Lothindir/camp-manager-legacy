@@ -1,5 +1,5 @@
 <template>
-  <div id="app" style="animation: fadein 0.5s;" class="flex h-screen bg-gray-900 select-none pt-8 border border-black overflow-hidden">
+  <div id="app" style="animation: fadein 0.5s;" class="flex h-screen bg-gray-900 select-none pt-8 border border-black overflow-hidden font-quicksand">
     <Titlebar></Titlebar>
     <Sidebar></Sidebar>
     <router-view/>

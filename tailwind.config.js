@@ -250,6 +250,10 @@ module.exports = {
         '"Courier New"',
         'monospace',
       ],
+      quicksand: [
+          'Quicksand',
+          'sans-serif'
+      ]
     },
     fontSize: {
       xs: '0.75rem',
