@@ -88,9 +88,14 @@
                 this.$emit('close');
             },
             addEvent: function () {
-                if(this.event.title !== '' && this.eventduration !== null && this.event.eventManagers.length > 0 && this.event.eventType !== null) {
+                if(this.event.title !== '' && this.event.duration !== null && this.event.eventManagers.length > 0 && this.event.eventType !== null) {
                     this.$emit('submit', this.event);
                 }
+            },
+            clearFields: function () {
+                let setAll = (obj, val) => Object.keys(obj).forEach(k => obj[k] = val);
+                let setNull = obj => setAll(obj, null);
+                setNull(this.event);
             }
         }
     }

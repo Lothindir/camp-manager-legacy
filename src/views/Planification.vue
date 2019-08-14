@@ -65,11 +65,14 @@
     import FullCalendar from '@fullcalendar/vue';
     import dayGridPlugin from '@fullcalendar/daygrid';
     import timeGridPlugin from '@fullcalendar/timegrid';
+    import momentPlugin from '@fullcalendar/moment';
+    import { toMoment, toDuration } from '@fullcalendar/moment';
     import interactionPlugin, { Draggable } from '@fullcalendar/interaction';
     import frLocale from '../assets/js/cm-fr';
     import AddEventModal from "../components/AddEventModal";
 
     const { ipcRenderer } = require('electron');
+    var moment = require('moment');
 
 
     export default {
@@ -83,7 +86,7 @@
         },
         data() {
             return {
-                calendarPlugins: [ dayGridPlugin, timeGridPlugin, interactionPlugin ],
+                calendarPlugins: [ dayGridPlugin, timeGridPlugin, interactionPlugin, momentPlugin ],
                 locale: frLocale,
                 slotLabelFormat: {
                     hour: 'numeric',
@@ -190,6 +193,7 @@
             },
             dateChanged: function(dateInfo) {
                 this.selectionInfo = null;
+                this.selectedDate = dateInfo;
                 this.showModalDialog({
                     start: dateInfo.date,
                     title: 'New click',
@@ -216,15 +220,26 @@
             showModalDialog: function(eventInfo){
                 if(this.editCalendar === true) {
                     this.showModal = true;
-                    this.$refs.addEventModal.$once('submit', () => {
-                        console.log('Modal submitted data');
-                        this.showModal = false;
-                        this.newEvent(eventInfo);
-                    });
+                    // this.$refs.addEventModal.$once('submit', () => {
+                    //     console.log('Modal submitted data');
+                    //     this.showModal = false;
+                    //     this.newEvent(eventInfo);
+                    // });
                 }
             },
             addModalEvent: function(event) {
-                //event.title;
+                this.showModal = false;
+                event.start = this.selectedDate.date;
+                let duration = toDuration(event.duration);
+                let endDate = moment(toMoment(this.selectedDate.date, this.calendar)).add(duration);
+                event.end = endDate.format();
+                event.allDay = false;
+                event.extendedProps = [
+                    event.eventManagers,
+                    event.eventType];
+                console.log(event);
+                console.log(this.selectedDate);
+                this.newEvent(event);
             },
             clearModalDialog: function(){
                 this.showModal = false;
