@@ -56,7 +56,7 @@
                         }"
                       class="z-10"
         />
-        <AddEventModal ref="addEventModal" v-bind:edit-event="editCalendar" v-bind:edit-duration="editModalDuration" v-bind:prop-title="activeEvent.title" v-bind:prop-managers="activeEvent.managers" v-bind:prop-type="activeEvent.type" v-bind:add-event="modalAddEvent"
+        <AddEventModal ref="addEventModal" v-bind:edit-event="editCalendar" v-bind:edit-duration="editModalDuration" v-bind:prop-title="activeEvent.title" v-bind:prop-all-day="activeEvent.allDay" v-bind:prop-managers="activeEvent.managers" v-bind:prop-type="activeEvent.type" v-bind:add-event="modalAddEvent"
                        v-if="showModal" v-on:close="showModal = false" v-on:submit="addModalEvent" v-on:edit="editModalEvent"></AddEventModal>
     </div>
 </template>
@@ -121,6 +121,7 @@
                 modalAddEvent: false,
                 activeEvent: {
                     id: '',
+                    allDay: false,
                     title: '',
                     managers: [],
                     type: ''
@@ -207,12 +208,11 @@
             },
             /* Stores the current selected dateTime */
             dateChanged: function(dateInfo) {
+                console.log('DateChanged');
                 this.selectionInfo = null;
                 this.selectedDate = dateInfo;
                 this.showModalDialog({
                     start: dateInfo.date,
-                    title: 'New click',
-                    color: 'red',
                     allDay: dateInfo.allDay
                 });
             },
@@ -223,9 +223,17 @@
                 ipcRenderer.send('async-new-event', this.normalizeEventObject(info.event));
             },
             updateEventPosition: function(eventDropInfo){
-                console.log(this.normalizeEventObject(eventDropInfo.oldEvent));
-                ipcRenderer.send('async-replace-event', { old: this.normalizeEventObject(eventDropInfo.oldEvent), new: this.normalizeEventObject(eventDropInfo.event)});
-                console.log('Sent moved event');
+                if(eventDropInfo.oldEvent.allDay !== eventDropInfo.event.allDay){
+                    eventDropInfo.revert();
+                }
+                else {
+                    console.log(this.normalizeEventObject(eventDropInfo.oldEvent));
+                    ipcRenderer.send('async-replace-event', {
+                        old: this.normalizeEventObject(eventDropInfo.oldEvent),
+                        new: this.normalizeEventObject(eventDropInfo.event)
+                    });
+                    console.log('Sent moved event');
+                }
             },
             updateEventDuration: function(eventResizeInfo){
                 ipcRenderer.send('async-replace-event', { old: this.normalizeEventObject(eventResizeInfo.prevEvent), new: this.normalizeEventObject(eventResizeInfo.event)});
@@ -233,6 +241,7 @@
             },
             showModalDialog: function(eventInfo){
                 if(this.editCalendar === true) {
+                    this.activeEvent.allDay = eventInfo.allDay;
                     this.editModalDuration = !eventInfo.allDay; // If it's an all day event, do not edit the duration
                     this.modalAddEvent = true;
                     this.showModal = true;
@@ -243,6 +252,7 @@
                 this.modalAddEvent = false;
                 this.activeEvent.id = eventInfo.event.id;
                 this.activeEvent.title = eventInfo.event.title;
+                this.activeEvent.allDay = eventInfo.event.allDay;
                 this.activeEvent.managers = eventInfo.event.extendedProps.managers;
                 this.activeEvent.type = eventInfo.event.extendedProps.type;
                 this.showModal = true;
@@ -257,7 +267,6 @@
                     let duration = toDuration(event.duration);
                     let endDate = moment(toMoment(this.selectedDate.date, this.calendar)).add(duration);
                     event.end = endDate.format();
-                    event.allDay = false;
                 }
                 event.extendedProps = {
                     'managers': event.eventManagers,
