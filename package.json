@@ -2,7 +2,7 @@
   "name": "camp-manager",
   "description": "A camp manager made with Vue.js, Electron & TailwindCSS",
   "author": "Francesco Monti",
-  "version": "0.1.7",
+  "version": "beta 0.1.8",
   "license": "MIT",
   "bugs": "https://github.com/Lothindir/camp-manager/issues",
   "repository": {
