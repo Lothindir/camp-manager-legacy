@@ -1,7 +1,7 @@
 <template>
     <transition name="modal-fade">
         <div class="modal-backdrop flex items-center justify-center fixed top-0 left-0 w-full h-full mt-4">
-            <div class="modal bg-gray-300 border border-gray-900 shadow-2xl flex flex-col z-10 p-2 rounded" role="dialog" aria-labelledby="modalTitle" aria-describedby="modalDescription">
+            <div class="modal bg-gray-300 border border-gray-900 shadow-2xl flex flex-col z-10 p-2 rounded min-w-24" role="dialog" aria-labelledby="modalTitle" aria-describedby="modalDescription">
                 <header class="modal-header flex items-center justify-between p-1 border-b border-gray-200 text-green-600">
                     <slot name="title">
                         This is the default title!

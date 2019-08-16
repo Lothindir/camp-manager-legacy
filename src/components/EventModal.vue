@@ -5,14 +5,14 @@
         </template>
 
         <template v-slot:body>
-            <div class="flex flex-wrap w-full h-full" :class="event.allDay ? '' : '-mx-3 mb-6'">
-                <div class="w-full px-3 mb-6 md:mb-0" :class="event.allDay ? '' : 'md:w-1/2'">
+            <div class="flex flex-wrap w-full h-full" :class="isShowDuration() ? '' : 'mb-6'">
+                <div class="w-full mb-6 md:mb-0" :class="isShowDuration() ? '' : 'pr-3 md:w-1/2'">
                     <label class="form-label" for="title">
                         {{(propAllDay ? 'Chef de jour' : 'Titre')}}
                     </label>
                     <input class="form-input" id="title" type="text" :placeholder="getTitlePlaceholder()" v-model="event.title" :disabled="editEvent === false">
                 </div>
-                <div class="w-full md:w-1/2 px-3" v-if="!event.allDay">
+                <div class="w-full md:w-1/2 pl-3" v-if="!isShowDuration()">
                     <label class="form-label" for="evDuration">
                         Durée
                     </label>
@@ -24,7 +24,7 @@
                     <label class="form-label" for="event-type">
                         Type d'activité
                     </label>
-                    <Multiselect class="border border-gray-400 rounded text-gray-700" id="event-type" v-model="event.eventType" :options="eventTypes" :searchable="true" placeholder="Choisir un type d'activité" :disabled="editEvent === false">
+                    <Multiselect class="border border-gray-400 rounded text-gray-700 h-10" id="event-type" v-model="event.eventType" :options="eventTypes" :searchable="true" placeholder="Choisir un type d'activité" :disabled="editEvent === false">
                     </Multiselect>
                 </div>
             </div>
@@ -33,7 +33,7 @@
                     <label class="form-label" for="resp">
                         Responsable(s)
                     </label>
-                    <Multiselect class="border border-gray-400 rounded text-gray-700" id="resp" v-model="event.eventManagers" :options="chiefs" :multiple="true" :searchable="false" track-by="fullName" label="code"
+                    <Multiselect class="border border-gray-400 rounded text-gray-700 h-10" id="resp" v-model="event.eventManagers" :options="chiefs" :multiple="true" :searchable="false" track-by="fullName" label="code"
                                  placeholder="Choisir au moins un responsable" :disabled="editEvent === false">
                         <template slot="option" slot-scope="{option}">{{ option.fullName }}</template>
                     </Multiselect>
@@ -165,6 +165,9 @@
                 else{
                     return 'Fermer';
                 }
+            },
+            isShowDuration: function () {
+                return this.event.allDay || !this.editDuration;
             }
         }
     }
@@ -176,7 +179,7 @@
     }
 
     .form-input {
-        @apply appearance-none block w-full bg-gray-200 text-gray-700 border border-gray-400 rounded py-3 px-4 mb-3 leading-tight;
+        @apply appearance-none block w-full bg-gray-200 text-gray-700 border border-gray-400 rounded py-3 px-4 leading-tight h-10;
     }
 
     .form-input:focus {
