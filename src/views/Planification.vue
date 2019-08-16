@@ -44,6 +44,7 @@
                       v-on:eventReceive="eventDropped"
                       v-on:eventDrop="updateEventPosition"
                       v-on:eventResize="updateEventDuration"
+                      v-on:eventClick="eventClicked"
                       :slot-label-format="slotLabelFormat"
                       :custom-buttons="customButtons"
                       :header="{
@@ -55,7 +56,8 @@
                         }"
                       class="z-10"
         />
-        <AddEventModal ref="addEventModal" v-show="showModal" v-on:close="showModal = false" v-on:submit="addModalEvent"></AddEventModal>
+        <AddEventModal ref="addEventModal" v-bind:editable="editCalendar" v-bind:edit-duration="editModalDuration" v-bind:prop-title="activeEvent.title" v-bind:prop-managers="activeEvent.managers" v-bind:prop-type="activeEvent.type"
+                       v-if="showModal" v-on:close="showModal = false" v-on:submit="addModalEvent" v-on:edit="editModalEvent"></AddEventModal>
     </div>
 </template>
 
@@ -73,6 +75,7 @@
 
     const { ipcRenderer } = require('electron');
     var moment = require('moment');
+    var cloneDeep = require('lodash.clonedeep');
 
 
     export default {
@@ -114,6 +117,13 @@
                 selectedDate: null,
                 calendar: null,
                 showModal: false,
+                editModalDuration: true,
+                activeEvent: {
+                    id: '',
+                    title: '',
+                    managers: [],
+                    type: ''
+                },
                 editCalendar: false,
                 slotDurations: [
                     { value: "00:15:00", text: "15 minutes" },
@@ -143,7 +153,8 @@
                         duration: {minutes: 30},
                         color: "MidnightBlue"
                     }
-                ]
+                ],
+                eventsIds: []
             }
         },
         props: {
@@ -160,6 +171,7 @@
 
                 ipcRenderer.on('async-response-all-events', (ev, arg) => {
                     for(let event of arg){
+                        delete event['_id']; // Delete the given NeDB id
                         this.calendar.addEvent(event);
                     }
                 });
@@ -191,6 +203,7 @@
             selectionChanged: function (selectionInfo) {
                 this.selectionInfo = selectionInfo;
             },
+            /* Stores the current selected dateTime */
             dateChanged: function(dateInfo) {
                 this.selectionInfo = null;
                 this.selectedDate = dateInfo;
@@ -201,7 +214,6 @@
                     allDay: dateInfo.allDay
                 });
             },
-            /* Stores the current selected dateTime */
             eventDropped: function(info){
                 this.selectionInfo = null;
                 this.selectedDate = null;
@@ -219,13 +231,17 @@
             },
             showModalDialog: function(eventInfo){
                 if(this.editCalendar === true) {
+                    this.editModalDuration = !eventInfo.allDay; // If it's an all day event, do not edit the duration
                     this.showModal = true;
-                    // this.$refs.addEventModal.$once('submit', () => {
-                    //     console.log('Modal submitted data');
-                    //     this.showModal = false;
-                    //     this.newEvent(eventInfo);
-                    // });
                 }
+            },
+            eventClicked: function(eventInfo) {
+                this.editModalDuration = false;
+                this.activeEvent.id = eventInfo.event.id;
+                this.activeEvent.title = eventInfo.event.title;
+                this.activeEvent.managers = eventInfo.event.extendedProps.managers;
+                this.activeEvent.type = eventInfo.event.extendedProps.type;
+                this.showModal = true;
             },
             addModalEvent: function(event) {
                 this.showModal = false;
@@ -234,12 +250,20 @@
                 let endDate = moment(toMoment(this.selectedDate.date, this.calendar)).add(duration);
                 event.end = endDate.format();
                 event.allDay = false;
-                event.extendedProps = [
-                    event.eventManagers,
-                    event.eventType];
-                console.log(event);
-                console.log(this.selectedDate);
+                event.extendedProps = {
+                    'managers': event.eventManagers,
+                    'type': event.eventType};
                 this.newEvent(event);
+            },
+            editModalEvent: function(event){
+                this.showModal = false;
+                let newEvent = this.calendar.getEventById(this.activeEvent.id);
+                let oldEvent = cloneDeep(newEvent);
+                newEvent.setProp('title', event.title);
+                newEvent.setExtendedProp('managers', event.eventManagers);
+                newEvent.setExtendedProp('type', event.eventType);
+                ipcRenderer.send('async-replace-event', { old: this.normalizeEventObject(oldEvent), new: this.normalizeEventObject(newEvent)});
+                console.log('Sent edited event');
             },
             clearModalDialog: function(){
                 this.showModal = false;
@@ -254,35 +278,42 @@
                     }
                 }
             },
+            getUniqueId: function() {
+                let id;
+                do {
+                    id = Math.random().toString(36).substr(2, 16);
+                } while (this.eventsIds.indexOf(id) !== -1);
+                this.eventsIds.push(id);
+                return id;
+            },
             /* Creates a new event from the selection data */
             newEvent: function (eventInfo) {
                 let event = {};
                 if(this.selectionInfo !== null){
                     console.log('Adding selection event');
                     event = {
+                        id: this.selectionInfo.id,
                         allDay: this.selectionInfo.allDay,
                         start: this.selectionInfo.start,
                         end: this.selectionInfo.end,
                         title: 'New button',
                         color: 'blue',
-                        extendedProps: {
-                            resp: ['FM', 'KM']
-                        }
+                        extendedProps: {}
                     };
                 }
                 else if(eventInfo !== undefined){
                     console.log('Adding eventInfo');
                     event = {
+                        id: eventInfo.id,
                         start: eventInfo.start,
                         end: eventInfo.end,
                         title: eventInfo.title,
                         color: eventInfo.color,
                         allDay: eventInfo.allDay,
-                        extendedProps: {
-                            resp: ['FM', 'KM']
-                        }
+                        extendedProps: eventInfo.extendedProps
                     };
                 }
+                event.id = this.getUniqueId();
                 let generatedEvent = this.calendar.addEvent(event);
 
                 ipcRenderer.send('async-new-event', this.normalizeEventObject(generatedEvent));
@@ -298,6 +329,7 @@
             },
             normalizeEventObject: function (EventObject) {
                 return {
+                    id: EventObject.id,
                     start: EventObject.start,
                     end: EventObject.end,
                     title: EventObject.title,
