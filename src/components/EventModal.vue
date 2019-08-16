@@ -5,25 +5,21 @@
         </template>
 
         <template v-slot:body>
-            <div class="flex flex-wrap -mx-3 mb-6 w-full h-full">
-                <div class="w-full md:w-1/2 px-3 mb-6 md:mb-0">
+            <div class="flex flex-wrap w-full h-full" :class="event.allDay ? '' : '-mx-3 mb-6'">
+                <div class="w-full px-3 mb-6 md:mb-0" :class="event.allDay ? '' : 'md:w-1/2'">
                     <label class="form-label" for="title">
-                        Titre
+                        {{(propAllDay ? 'Chef de jour' : 'Titre')}}
                     </label>
-                    <input class="form-input" id="title" type="text" placeholder="SC 3.2 - Jeux d'eau" v-model="event.title" :disabled="editEvent === false">
+                    <input class="form-input" id="title" type="text" :placeholder="getTitlePlaceholder()" v-model="event.title" :disabled="editEvent === false">
                 </div>
-                <div class="w-full md:w-1/2 px-3">
+                <div class="w-full md:w-1/2 px-3" v-if="!event.allDay">
                     <label class="form-label" for="evDuration">
                         Durée
                     </label>
                     <input class="form-input" id="evDuration" type="time" min="06:00" max="23:00" step="900" v-model="event.duration" :disabled="editDuration === false || editEvent === false || event.allDay === true"> <!-- step="900" represents 15 min -->
-                    <label class="form-label" for="evAllDay">
-                        Toute la journée
-                    </label>
-                    <input class="form-control" id="evAllDay" type="checkbox" v-model="event.allDay" :disabled="editDuration === false || editEvent === false">
                 </div>
             </div>
-            <div class="flex flex-wrap -mx-3 mb-6">
+            <div class="flex flex-wrap -mx-3 mb-6" v-if="!event.allDay">
                 <div class="w-full px-3">
                     <label class="form-label" for="event-type">
                         Type d'activité
@@ -32,7 +28,7 @@
                     </Multiselect>
                 </div>
             </div>
-            <div class="flex flex-wrap -mx-3 mb-6">
+            <div class="flex flex-wrap -mx-3 mb-6" v-if="!event.allDay">
                 <div class="w-full px-3">
                     <label class="form-label" for="resp">
                         Responsable(s)
@@ -103,19 +99,22 @@
                 this.clearFields();
             },
             submitEvent: function () {
-                if(this.event.title !== '' && this.event.eventManagers.length > 0 && this.event.eventType !== null) {
+                let eventName;
+                if(this.addEvent){
+                    eventName = 'submit';
+                }
+                else if(this.editEvent)
+                {
+                    eventName = 'edit';
+                }
+                else{
+                    eventName = 'close';
+                }
 
-                    let eventName;
-                    if(this.addEvent){
-                        eventName = 'submit';
-                    }
-                    else if(this.editEvent)
-                    {
-                        eventName = 'edit';
-                    }
-                    else{
-                        eventName = 'close';
-                    }
+                if(this.event.allDay && this.event.title !== ''){
+                    this.$emit(eventName, this.event);
+                }
+                else if(this.event.title !== '' && this.event.eventManagers.length > 0 && this.event.eventType !== null) {
 
                     if(this.editDuration){
                         if(this.allDay){
@@ -144,14 +143,17 @@
             },
             getModalTitle: function () {
                 if(this.addEvent){
-                    return 'Ajouter une activité';
+                    return 'Ajouter';
                 }
                 else if(this.editEvent){
-                    return 'Modifier une activité';
+                    return 'Modifier';
                 }
                 else{
-                    return 'Voir une activité';
+                    return 'Voir';
                 }
+            },
+            getTitlePlaceholder: function() {
+              return this.event.allDay ? 'Francesco' : 'SC 3.2 - Jeux d\'eau';
             },
             getSubmitButtonText: function () {
                 if(this.addEvent){
