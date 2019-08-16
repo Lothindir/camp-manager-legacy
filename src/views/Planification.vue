@@ -56,7 +56,7 @@
                         }"
                       class="z-10"
         />
-        <AddEventModal ref="addEventModal" v-bind:editable="editCalendar" v-bind:edit-duration="editModalDuration" v-bind:prop-title="activeEvent.title" v-bind:prop-managers="activeEvent.managers" v-bind:prop-type="activeEvent.type"
+        <AddEventModal ref="addEventModal" v-bind:edit-event="editCalendar" v-bind:edit-duration="editModalDuration" v-bind:prop-title="activeEvent.title" v-bind:prop-managers="activeEvent.managers" v-bind:prop-type="activeEvent.type" v-bind:add-event="modalAddEvent"
                        v-if="showModal" v-on:close="showModal = false" v-on:submit="addModalEvent" v-on:edit="editModalEvent"></AddEventModal>
     </div>
 </template>
@@ -71,7 +71,7 @@
     import { toMoment, toDuration } from '@fullcalendar/moment';
     import interactionPlugin, { Draggable } from '@fullcalendar/interaction';
     import frLocale from '../assets/js/cm-fr';
-    import AddEventModal from "../components/AddEventModal";
+    import AddEventModal from "../components/EventModal";
 
     const { ipcRenderer } = require('electron');
     var moment = require('moment');
@@ -118,6 +118,7 @@
                 calendar: null,
                 showModal: false,
                 editModalDuration: true,
+                modalAddEvent: false,
                 activeEvent: {
                     id: '',
                     title: '',
@@ -173,6 +174,7 @@
                     for(let event of arg){
                         delete event['_id']; // Delete the given NeDB id
                         this.calendar.addEvent(event);
+                        this.eventsIds.push(event.id);
                     }
                 });
 
@@ -232,11 +234,13 @@
             showModalDialog: function(eventInfo){
                 if(this.editCalendar === true) {
                     this.editModalDuration = !eventInfo.allDay; // If it's an all day event, do not edit the duration
+                    this.modalAddEvent = true;
                     this.showModal = true;
                 }
             },
             eventClicked: function(eventInfo) {
                 this.editModalDuration = false;
+                this.modalAddEvent = false;
                 this.activeEvent.id = eventInfo.event.id;
                 this.activeEvent.title = eventInfo.event.title;
                 this.activeEvent.managers = eventInfo.event.extendedProps.managers;
@@ -246,10 +250,15 @@
             addModalEvent: function(event) {
                 this.showModal = false;
                 event.start = this.selectedDate.date;
-                let duration = toDuration(event.duration);
-                let endDate = moment(toMoment(this.selectedDate.date, this.calendar)).add(duration);
-                event.end = endDate.format();
-                event.allDay = false;
+                if(event.duration === '24:00'){
+                    event.allDay = true;
+                }
+                else{
+                    let duration = toDuration(event.duration);
+                    let endDate = moment(toMoment(this.selectedDate.date, this.calendar)).add(duration);
+                    event.end = endDate.format();
+                    event.allDay = false;
+                }
                 event.extendedProps = {
                     'managers': event.eventManagers,
                     'type': event.eventType};
@@ -259,6 +268,8 @@
                 this.showModal = false;
                 let newEvent = this.calendar.getEventById(this.activeEvent.id);
                 let oldEvent = cloneDeep(newEvent);
+                console.log(oldEvent);
+                console.log(newEvent);
                 newEvent.setProp('title', event.title);
                 newEvent.setExtendedProp('managers', event.eventManagers);
                 newEvent.setExtendedProp('type', event.eventType);
