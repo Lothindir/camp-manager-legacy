@@ -132,3 +132,9 @@ ipcMain.on('async-replace-event', (e, sentEvents) => {
             console.log(err);
     });
 });
+
+ipcMain.on('async-delete-event', (e, event) => {
+   console.log('Deleting event');
+   console.log(event);
+   eventsDatabase.remove(event);
+});

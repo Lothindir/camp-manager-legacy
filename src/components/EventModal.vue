@@ -24,7 +24,7 @@
                     <label class="form-label" for="event-type">
                         Type d'activité
                     </label>
-                    <Multiselect class="border border-gray-400 rounded text-gray-700 h-10" id="event-type" v-model="event.eventType" :options="eventTypes" :searchable="true" placeholder="Choisir un type d'activité" :disabled="editEvent === false">
+                    <Multiselect class="border border-gray-400 rounded text-gray-700 h-10" id="event-type" v-model="event.eventType" :options="eventTypes" :searchable="true" track-by="type" label="type" placeholder="Choisir un type d'activité" :disabled="editEvent === false">
                     </Multiselect>
                 </div>
             </div>
@@ -42,7 +42,9 @@
         </template>
 
         <template v-slot:footer>
-            <button class="form-button mx-auto w-1/2" v-on:click="submitEvent">{{getSubmitButtonText()}}</button>
+            <button class="form-button bg-green-600 hover:bg-green-800 mx-auto" v-on:click="submitEvent">{{getSubmitButtonText()}}</button>
+            <button class="form-button bg-red-600 hover:bg-red-800 ml-3" v-if="editEvent && !addEvent" v-on:click="deleteEvent(false)">Effacer</button>
+            <ConfirmDeleteEventModal v-if="showDeleteModal" v-on:cancel="showDeleteModal = false" v-on:delete="deleteEvent(true)"></ConfirmDeleteEventModal>
         </template>
     </Modal>
 </template>
@@ -52,10 +54,12 @@
     import Multiselect from "vue-multiselect";
 
     import "vue-multiselect/dist/vue-multiselect.min.css";
+    import ConfirmDeleteEventModal from "./ConfirmDeleteEventModal";
 
     export default {
         name: "AddEventModal",
         components: {
+            ConfirmDeleteEventModal,
             Multiselect,
           Modal
         },
@@ -66,7 +70,7 @@
             propTitle: String,
             propAllDay: Boolean,
             propManagers: Array,
-            propType: String
+            propType: Object
         },
         data() {
           return {
@@ -83,15 +87,21 @@
                   { code: 'BG', fullName: 'Benoit Guignard' }
               ],
               eventTypes: [
-                  "Sport de Camp",
-                  "Activité de Camp",
-                  "Vécu de Camp",
-                  "CDF",
-                  "Repas",
-                  "Social",
-                  "Divers"
-              ]
+                  { type: "Sport de Camp", color: "Peru" },
+                  { type: "Activité de Camp", color: "SteelBlue" },
+                  { type: "Vécu de Camp", color: "MediumSlateBlue" },
+                  { type: "CDF", color: "LightSeaGreen" },
+                  { type: "Repas", color: "IndianRed" },
+                  { type: "Social", color: "ForestGreen" },
+                  { type: "Divers", color: "RosyBrown" }
+              ],
+              showDeleteModal: false
           }
+        },
+        mounted: function() {
+            if(this.addEvent)  {
+                this.clearFields();
+            }
         },
         methods: {
             close: function () {
@@ -118,10 +128,10 @@
 
                     if(this.editDuration){
                         if(this.allDay){
-                            this.duration = null;
+                            this.event.duration = null;
                             this.$emit(eventName, this.event);
                         }
-                        else if (this.duration === null){
+                        else if (this.event.duration === null){
                             // TODO show some error message
                         }
                         else{
@@ -134,6 +144,16 @@
                 }
                 else {
                     // TODO show some error message
+                }
+            },
+            deleteEvent: function(confirmed) {
+                if(!confirmed) {
+                    console.log('Show delete modal');
+                    this.showDeleteModal = true;
+                }
+                else{
+                    this.showDeleteModal = false;
+                    this.$emit('delete');
                 }
             },
             clearFields: function () {
@@ -191,11 +211,7 @@
     }
 
     .form-button {
-        @apply shadow-lg pt-3 pb-3 mt-4 text-white bg-green-600 rounded;
-    }
-
-    .form-button:hover {
-        @apply bg-green-400;
+        @apply shadow-lg pt-3 pb-3 mt-4 text-white rounded w-1/2;
     }
 </style>
 

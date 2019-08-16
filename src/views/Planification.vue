@@ -2,8 +2,8 @@
     <div ref="container" class="flex flex-1 items-start align-middle ml-12 px-2 pt-4 bg-gray-600 text-gray-800">
         <div id="defaultEventsContainer" ref="defaultEventsContainer" :style="this.editCalendar ? '' : 'border-color: transparent'" class="flex justify-center flex-col border border-black bg-gray-600 mr-3 mt-20 p-1 h-auto">
             <div class="flex justify-center items-center w-32">
-                <input class="p-1" type="checkbox" name="editCheckbox" id="editCheckbox" v-model="editCalendar">
-                <label class="px-1 text-lg block uppercase tracking-wide text-gray-800 font-bold" for="editCheckbox">Modifier</label>
+                <input class="p-1 hidden" type="checkbox" name="editCheckbox" v-on:change="styleEditCheckboxLabel" id="editCheckbox" v-model="editCalendar">
+                <label class="text-gray-800" id="editCheckboxLabel" for="editCheckbox">Modifier</label>
             </div>
             <transition name="edit-menu">
                 <div v-if="editCalendar">
@@ -46,7 +46,7 @@
                       v-on:eventResize="updateEventDuration"
                       v-on:eventClick="eventClicked"
                       :slot-label-format="slotLabelFormat"
-                      :custom-buttons="customButtons"
+                      :custom-buttons="getCustomButtons()"
                       :header="{
                         center: 'addEventButton, clearAllEvents',
                         right: 'weekTimeGridView, timeGridDay'
@@ -57,7 +57,7 @@
                       class="z-10"
         />
         <AddEventModal ref="addEventModal" v-bind:edit-event="editCalendar" v-bind:edit-duration="editModalDuration" v-bind:prop-title="activeEvent.title" v-bind:prop-all-day="activeEvent.allDay" v-bind:prop-managers="activeEvent.managers" v-bind:prop-type="activeEvent.type" v-bind:add-event="modalAddEvent"
-                       v-if="showModal" v-on:close="showModal = false" v-on:submit="addModalEvent" v-on:edit="editModalEvent"></AddEventModal>
+                       v-if="showModal" v-on:close="showModal = false" v-on:submit="addModalEvent" v-on:delete="deleteModalEvent" v-on:edit="editModalEvent"></AddEventModal>
     </div>
 </template>
 
@@ -103,16 +103,6 @@
                     buttonText: 'Semaine'
                 },
                 calendarHeight: this.getCalendarHeight(),
-                customButtons: {
-                    addEventButton: {
-                        text: "Nouvelle activité",
-                        click: this.showModalDialog
-                    },
-                    clearAllEvents: {
-                        text: "Effacer tout",
-                        click: this.clearAllEvents
-                    }
-                },
                 selectionInfo: null,
                 selectedDate: null,
                 calendar: null,
@@ -124,7 +114,7 @@
                     allDay: false,
                     title: '',
                     managers: [],
-                    type: ''
+                    type: {}
                 },
                 editCalendar: false,
                 slotDurations: [
@@ -144,6 +134,10 @@
                         title: "Repas",
                         duration: {minutes: 60},
                         color: "IndianRed",
+                        extendedProps: [
+                            {},
+                            {type: 'Repas', color: 'IndianRed'}
+                        ]
                     },
                     {
                         title: "Shhhhh'Time",
@@ -202,13 +196,37 @@
             changeCalendarHeight: function () {
                 this.calendarHeight = this.getCalendarHeight();
             },
+            getCustomButtons: function() {
+                if(this.editCalendar){
+                    return {
+                        addEventButton: {
+                            text: "Nouvelle activité",
+                            click: this.showModalDialog
+                        },
+                        clearAllEvents: {
+                            text: "Effacer tout",
+                            click: this.clearAllEvents
+                        }
+                    };
+                }
+            },
+            styleEditCheckboxLabel: function() {
+                let editCheckbox = document.getElementById('editCheckbox');
+                let editCheckboxLabel = document.getElementById('editCheckboxLabel');
+                if(editCheckbox.checked){
+                    editCheckboxLabel.setAttribute('class', 'bg-gray-500 text-white');
+                }
+                else {
+                    editCheckboxLabel.setAttribute('class', 'text-gray-800');
+                }
+            },
             /* Stores the current selection */
             selectionChanged: function (selectionInfo) {
                 this.selectionInfo = selectionInfo;
+                this.selectedDate = null;
             },
             /* Stores the current selected dateTime */
             dateChanged: function(dateInfo) {
-                console.log('DateChanged');
                 this.selectionInfo = null;
                 this.selectedDate = dateInfo;
                 this.showModalDialog({
@@ -242,7 +260,7 @@
             showModalDialog: function(eventInfo){
                 if(this.editCalendar === true) {
                     this.activeEvent.allDay = eventInfo.allDay;
-                    this.editModalDuration = !eventInfo.allDay; // If it's an all day event, do not edit the duration
+                    this.editModalDuration = !(eventInfo.allDay || this.selectionInfo !== null); // If it's an all day event or a selection, do not edit the duration
                     this.modalAddEvent = true;
                     this.showModal = true;
                 }
@@ -254,36 +272,57 @@
                 this.activeEvent.title = eventInfo.event.title;
                 this.activeEvent.allDay = eventInfo.event.allDay;
                 this.activeEvent.managers = eventInfo.event.extendedProps.managers;
-                this.activeEvent.type = eventInfo.event.extendedProps.type;
+                this.activeEvent.type.type = eventInfo.event.extendedProps.type;
+                this.activeEvent.type.color = eventInfo.event.color;
                 this.showModal = true;
             },
             addModalEvent: function(event) {
                 this.showModal = false;
-                event.start = this.selectedDate.date;
-                if(event.duration === '24:00'){
-                    event.allDay = true;
+                if(this.selectedDate !== null) {
+                    event.start = this.selectedDate.date;
+                    if (event.duration === '24:00') {
+                        event.allDay = true;
+                    } else {
+                        let duration = toDuration(event.duration);
+                        let endDate = moment(toMoment(this.selectedDate.date, this.calendar)).add(duration);
+                        event.end = endDate.format();
+                    }
                 }
                 else{
-                    let duration = toDuration(event.duration);
-                    let endDate = moment(toMoment(this.selectedDate.date, this.calendar)).add(duration);
-                    event.end = endDate.format();
+                    event.start = this.selectionInfo.start;
+                    event.end = this.selectionInfo.end;
+                    event.allDay = this.selectionInfo.allDay;
                 }
+                event.color = event.eventType.color;
                 event.extendedProps = {
                     'managers': event.eventManagers,
-                    'type': event.eventType};
+                    'type': event.eventType.type
+                };
                 this.newEvent(event);
+                this.selectionInfo = null;
+                this.selectedDate = null;
             },
             editModalEvent: function(event){
                 this.showModal = false;
                 let newEvent = this.calendar.getEventById(this.activeEvent.id);
                 let oldEvent = cloneDeep(newEvent);
-                console.log(oldEvent);
-                console.log(newEvent);
                 newEvent.setProp('title', event.title);
+                newEvent.setProp('color', event.eventType.color);
                 newEvent.setExtendedProp('managers', event.eventManagers);
-                newEvent.setExtendedProp('type', event.eventType);
+                newEvent.setExtendedProp('type', event.eventType.type);
+
+                console.log(this.activeEvent);
+
                 ipcRenderer.send('async-replace-event', { old: this.normalizeEventObject(oldEvent), new: this.normalizeEventObject(newEvent)});
                 console.log('Sent edited event');
+            },
+            deleteModalEvent: function() {
+                this.showModal = false;
+                let event = this.calendar.getEventById(this.activeEvent.id);
+                ipcRenderer.send('async-delete-event', this.normalizeEventObject(event));
+                console.log('Sent delete event');
+
+                event.remove();
             },
             clearModalDialog: function(){
                 this.showModal = false;
@@ -316,9 +355,9 @@
                         allDay: this.selectionInfo.allDay,
                         start: this.selectionInfo.start,
                         end: this.selectionInfo.end,
-                        title: 'New button',
-                        color: 'blue',
-                        extendedProps: {}
+                        title: eventInfo.title,
+                        color: eventInfo.color,
+                        extendedProps: eventInfo.extendedProps
                     };
                 }
                 else if(eventInfo !== undefined){
@@ -378,6 +417,14 @@
 
     .draggable-event:hover {
         @apply bg-blue-400;
+    }
+
+    #editCheckboxLabel {
+        @apply px-1 text-lg block uppercase tracking-wide font-bold rounded;
+    }
+
+    #editCheckboxLabel:hover {
+        @apply bg-gray-500;
     }
 
     .edit-menu-enter,
