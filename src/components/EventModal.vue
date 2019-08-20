@@ -42,8 +42,8 @@
         </template>
 
         <template v-slot:footer>
-            <button class="form-button bg-green-600 hover:bg-green-800 mx-auto" v-on:click="submitEvent">{{getSubmitButtonText()}}</button>
-            <button class="form-button bg-red-600 hover:bg-red-800 ml-3" v-if="editEvent && !addEvent" v-on:click="deleteEvent(false)">Effacer</button>
+            <button class="form-button bg-red-600 hover:bg-red-800 mx-auto" v-if="editEvent && !addEvent" v-on:click="deleteEvent(false)">Effacer</button>
+            <button class="form-button bg-green-600 hover:bg-green-800 ml-3" v-on:click="submitEvent">{{getSubmitButtonText()}}</button>
             <ConfirmDeleteEventModal v-if="showDeleteModal" v-on:cancel="showDeleteModal = false" v-on:delete="deleteEvent(true)"></ConfirmDeleteEventModal>
         </template>
     </Modal>
