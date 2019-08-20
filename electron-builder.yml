@@ -7,3 +7,6 @@ win:
 nsis:
   oneClick: false
   allowToChangeInstallationDirectory: true
+  artifactName: "${productName} Setup beta-${version}.${ext}"
+portable:
+  artifactName: "${productName} Portable beta-${version}.${ext}"
