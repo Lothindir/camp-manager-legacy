@@ -3,6 +3,7 @@ productName: "Camp Manager"
 win:
   target:
     - "nsis"
+    - "portable"
 nsis:
   oneClick: false
   allowToChangeInstallationDirectory: true

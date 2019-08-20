@@ -10,7 +10,7 @@
                     <label class="form-label" for="title">
                         {{(propAllDay ? 'Chef de jour' : 'Titre')}}
                     </label>
-                    <input class="form-input" id="title" type="text" :placeholder="getTitlePlaceholder()" v-model="event.title" :disabled="editEvent === false">
+                    <input class="form-input" id="title" type="text" :placeholder="getTitlePlaceholder()" v-model="event.title" :disabled="editEvent === false || isDefaultEvent">
                 </div>
                 <div class="w-full md:w-1/2 pl-3" v-if="!isShowDuration()">
                     <label class="form-label" for="evDuration">
@@ -19,21 +19,21 @@
                     <input class="form-input" id="evDuration" type="time" min="06:00" max="23:00" step="900" v-model="event.duration" :disabled="editDuration === false || editEvent === false || event.allDay === true"> <!-- step="900" represents 15 min -->
                 </div>
             </div>
-            <div class="flex flex-wrap -mx-3 mb-6" v-if="!event.allDay">
+            <div class="flex flex-wrap -mx-3 mb-6" v-if="!event.allDay && !isDefaultEvent">
                 <div class="w-full px-3">
                     <label class="form-label" for="event-type">
                         Type d'activité
                     </label>
-                    <Multiselect class="border border-gray-400 rounded text-gray-700 h-10" id="event-type" v-model="event.eventType" :options="eventTypes" :searchable="true" track-by="type" label="type" placeholder="Choisir un type d'activité" :disabled="editEvent === false">
+                    <Multiselect class="border border-gray-400 rounded text-gray-700 h-10" id="event-type" v-model="event.type" :options="getEventTypes" :searchable="true" placeholder="Choisir un type d'activité" :disabled="editEvent === false">
                     </Multiselect>
                 </div>
             </div>
-            <div class="flex flex-wrap -mx-3 mb-6" v-if="!event.allDay">
+            <div class="flex flex-wrap -mx-3 mb-6" v-if="!event.allDay && !isDefaultEvent">
                 <div class="w-full px-3">
                     <label class="form-label" for="resp">
                         Responsable(s)
                     </label>
-                    <Multiselect class="border border-gray-400 rounded text-gray-700 h-10" id="resp" v-model="event.eventManagers" :options="chiefs" :multiple="true" :searchable="false" track-by="fullName" label="code"
+                    <Multiselect class="border border-gray-400 rounded text-gray-700 h-10" id="resp" v-model="event.managers" :options="getManagers" :multiple="true" :searchable="false" track-by="fullName" label="code"
                                  placeholder="Choisir au moins un responsable" :disabled="editEvent === false">
                         <template slot="option" slot-scope="{option}">{{ option.fullName }}</template>
                     </Multiselect>
@@ -50,11 +50,15 @@
 </template>
 
 <script>
+    'use strict';
+    import { mapGetters } from 'vuex';
+    import { Manager } from '../store/modules/events';
     import Modal from "../components/Modal";
+    import ConfirmDeleteEventModal from "./ConfirmDeleteEventModal";
     import Multiselect from "vue-multiselect";
+    let cloneDeep = require('lodash.clonedeep');
 
     import "vue-multiselect/dist/vue-multiselect.min.css";
-    import ConfirmDeleteEventModal from "./ConfirmDeleteEventModal";
 
     export default {
         name: "AddEventModal",
@@ -67,34 +71,33 @@
             editEvent: Boolean,
             editDuration: Boolean,
             addEvent: Boolean,
+            isDefaultEvent: Boolean,
             propTitle: String,
             propAllDay: Boolean,
-            propManagers: Array,
-            propType: Object
+            propManagers: { // Validate if the input is a Manager (maybe to remove)
+                type: Array,
+                validator: function(value) {
+                    for (let manager of value) {
+                        if(!(manager instanceof Manager)){
+                            return false;
+                        }
+                    }
+                    return true;
+                }
+            },
+            propType: String
         },
+        computed: mapGetters(['getManagers', 'getEventTypes', 'getEventColor']),
         data() {
           return {
               event: {
                   title: this.propTitle,
                   duration: null,
                   allDay: this.propAllDay,
-                  eventManagers: this.propManagers,
-                  eventType: this.propType,
+                  managers: this.propManagers,
+                  type: this.propType,
+                  isDefault: this.isDefaultEvent
               },
-              chiefs: [
-                  { code: 'FM', fullName: 'Francesco Monti'},
-                  { code: 'KM', fullName: 'Katja Mosimann' },
-                  { code: 'BG', fullName: 'Benoit Guignard' }
-              ],
-              eventTypes: [
-                  { type: "Sport de Camp", color: "Peru" },
-                  { type: "Activité de Camp", color: "SteelBlue" },
-                  { type: "Vécu de Camp", color: "MediumSlateBlue" },
-                  { type: "CDF", color: "LightSeaGreen" },
-                  { type: "Repas", color: "IndianRed" },
-                  { type: "Social", color: "ForestGreen" },
-                  { type: "Divers", color: "RosyBrown" }
-              ],
               showDeleteModal: false
           }
         },
@@ -106,7 +109,6 @@
         methods: {
             close: function () {
                 this.$emit('close');
-                this.clearFields();
             },
             submitEvent: function () {
                 let eventName;
@@ -122,24 +124,24 @@
                 }
 
                 if(this.event.allDay && this.event.title !== ''){
-                    this.$emit(eventName, this.event);
+                    this.emitEvent(eventName, this.event);
                 }
-                else if(this.event.title !== '' && this.event.eventManagers.length > 0 && this.event.eventType !== null) {
+                else if(this.event.title !== '' && this.event.managers.length > 0 && this.event.type !== null) {
 
                     if(this.editDuration){
                         if(this.allDay){
                             this.event.duration = null;
-                            this.$emit(eventName, this.event);
+                            this.emitEvent(eventName, this.event);
                         }
                         else if (this.event.duration === null){
                             // TODO show some error message
                         }
                         else{
-                            this.$emit(eventName, this.event);
+                            this.emitEvent(eventName, this.event);
                         }
                     }
                     else {
-                        this.$emit(eventName, this.event);
+                        this.emitEvent(eventName, this.event);
                     }
                 }
                 else {
@@ -153,7 +155,7 @@
                 }
                 else{
                     this.showDeleteModal = false;
-                    this.$emit('delete');
+                    this.emitEvent('delete', null);
                 }
             },
             clearFields: function () {
@@ -187,7 +189,10 @@
                 }
             },
             isShowDuration: function () {
-                return this.event.allDay || !this.editDuration;
+                return this.event.allDay || !this.editDuration || this.isDefaultEvent;
+            },
+            emitEvent: function(eventName, eventData) {
+                this.$emit(eventName, cloneDeep(eventData));
             }
         }
     }

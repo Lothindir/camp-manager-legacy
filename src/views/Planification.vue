@@ -9,7 +9,7 @@
                 <div v-if="editCalendar">
                     <div class="border border-black p-1 m-1">
                         <h1 class="block uppercase tracking-wide text-gray-800 text-xs font-bold mb-2">Activités de base</h1>
-                        <div v-for="defaultEvent in defaultEvents" class='draggable-event fc-event p-1 my-1' :style="getEventBackgroundColor(defaultEvent.title)" :data-event="getEventData(defaultEvent.title)" :key="defaultEvent.title">{{defaultEvent.title}}</div>
+                        <div v-for="defaultEvent in getDefaultEvents" class='draggable-event fc-event p-1 my-1' :style="getEventBackgroundColor(defaultEvent.title)" :data-event="getEventData(defaultEvent.title)" :key="defaultEvent.title">{{defaultEvent.title}}</div>
                     </div>
 
                     <div class="border border-black p-1 m-1">
@@ -51,13 +51,11 @@
                         center: 'addEventButton, clearAllEvents',
                         right: 'weekTimeGridView, timeGridDay'
                         }"
-                      :views="{
-                        weekTimeGridView
-                        }"
+                      :views="{ weekTimeGridView }"
                       class="z-10"
         />
-        <AddEventModal ref="addEventModal" v-bind:edit-event="editCalendar" v-bind:edit-duration="editModalDuration" v-bind:prop-title="activeEvent.title" v-bind:prop-all-day="activeEvent.allDay" v-bind:prop-managers="activeEvent.managers" v-bind:prop-type="activeEvent.type" v-bind:add-event="modalAddEvent"
-                       v-if="showModal" v-on:close="showModal = false" v-on:submit="addModalEvent" v-on:delete="deleteModalEvent" v-on:edit="editModalEvent"></AddEventModal>
+        <AddEventModal ref="addEventModal" v-bind:edit-event="editCalendar" v-bind:edit-duration="editModalDuration" v-bind:is-default-event="activeEvent.isDefault" v-bind:prop-title="activeEvent.title" v-bind:prop-all-day="activeEvent.allDay" v-bind:prop-managers="activeEvent.managers" v-bind:prop-type="activeEvent.type" v-bind:add-event="modalAddEvent"
+                       v-if="showModal" v-on:close="clearModalDialog" v-on:submit="addModalEvent" v-on:delete="deleteModalEvent" v-on:edit="editModalEvent"></AddEventModal>
     </div>
 </template>
 
@@ -73,9 +71,12 @@
     import frLocale from '../assets/js/cm-fr';
     import AddEventModal from "../components/EventModal";
 
+    import { mapGetters } from 'vuex';
+    import { Manager } from "../store/modules/events";
+
     const { ipcRenderer } = require('electron');
-    var moment = require('moment');
-    var cloneDeep = require('lodash.clonedeep');
+    let moment = require('moment');
+    let cloneDeep = require('lodash.clonedeep');
 
 
     export default {
@@ -87,6 +88,7 @@
             AddEventModal,
             FullCalendar
         },
+        computed: mapGetters(['getDefaultEvents', 'getManagers', 'getEventTypes', 'getEventColor']),
         data() {
             return {
                 calendarPlugins: [ dayGridPlugin, timeGridPlugin, interactionPlugin, momentPlugin ],
@@ -113,8 +115,9 @@
                     id: '',
                     allDay: false,
                     title: '',
-                    managers: [],
-                    type: {}
+                    managers: [Manager],
+                    type: String,
+                    isDefault: false
                 },
                 editCalendar: false,
                 slotDurations: [
@@ -124,32 +127,6 @@
                 ],
                 slotDuration: "00:30:00",
                 minSlotDuration: "00:15:00",
-                defaultEvents: [
-                    {
-                        title: "Diane",
-                        duration: {minutes: 15},
-                        color: "RoyalBlue"
-                    },
-                    {
-                        title: "Repas",
-                        duration: {minutes: 60},
-                        color: "IndianRed",
-                        extendedProps: [
-                            {},
-                            {type: 'Repas', color: 'IndianRed'}
-                        ]
-                    },
-                    {
-                        title: "Shhhhh'Time",
-                        duration: {minutes: 30},
-                        color: "LightCoral"
-                    },
-                    {
-                        title: "TAPS",
-                        duration: {minutes: 30},
-                        color: "MidnightBlue"
-                    }
-                ],
                 eventsIds: []
             }
         },
@@ -245,7 +222,6 @@
                     eventDropInfo.revert();
                 }
                 else {
-                    console.log(this.normalizeEventObject(eventDropInfo.oldEvent));
                     ipcRenderer.send('async-replace-event', {
                         old: this.normalizeEventObject(eventDropInfo.oldEvent),
                         new: this.normalizeEventObject(eventDropInfo.event)
@@ -271,9 +247,9 @@
                 this.activeEvent.id = eventInfo.event.id;
                 this.activeEvent.title = eventInfo.event.title;
                 this.activeEvent.allDay = eventInfo.event.allDay;
-                this.activeEvent.managers = eventInfo.event.extendedProps.managers;
-                this.activeEvent.type.type = eventInfo.event.extendedProps.type;
-                this.activeEvent.type.color = eventInfo.event.color;
+                this.activeEvent.managers = this.getEventManagers(eventInfo.event.extendedProps.managers);
+                this.activeEvent.type = eventInfo.event.extendedProps.type;
+                this.activeEvent.isDefault = eventInfo.event.extendedProps.isDefaultEvent === true;
                 this.showModal = true;
             },
             addModalEvent: function(event) {
@@ -293,31 +269,30 @@
                     event.end = this.selectionInfo.end;
                     event.allDay = this.selectionInfo.allDay;
                 }
-                event.color = event.eventType.color;
                 event.extendedProps = {
-                    'managers': event.eventManagers,
-                    'type': event.eventType.type
+                    'managers': event.managers,
+                    'type': event.type
                 };
                 this.newEvent(event);
-                this.selectionInfo = null;
-                this.selectedDate = null;
+
+                this.clearModalDialog();
             },
             editModalEvent: function(event){
-                this.showModal = false;
+                this.clearModalDialog();
                 let newEvent = this.calendar.getEventById(this.activeEvent.id);
                 let oldEvent = cloneDeep(newEvent);
                 newEvent.setProp('title', event.title);
-                newEvent.setProp('color', event.eventType.color);
-                newEvent.setExtendedProp('managers', event.eventManagers);
-                newEvent.setExtendedProp('type', event.eventType.type);
-
-                console.log(this.activeEvent);
+                newEvent.setProp('backgroundColor', this.getEventColor(event.type));
+                newEvent.setProp('borderColor', this.getEventColor(event.type));
+                newEvent.setExtendedProp('managers', event.managers);
+                newEvent.setExtendedProp('type', event.type);
+                newEvent.setExtendedProp('isDefaultEvent', event.isDefault);
 
                 ipcRenderer.send('async-replace-event', { old: this.normalizeEventObject(oldEvent), new: this.normalizeEventObject(newEvent)});
                 console.log('Sent edited event');
             },
             deleteModalEvent: function() {
-                this.showModal = false;
+                this.clearModalDialog();
                 let event = this.calendar.getEventById(this.activeEvent.id);
                 ipcRenderer.send('async-delete-event', this.normalizeEventObject(event));
                 console.log('Sent delete event');
@@ -328,6 +303,7 @@
                 this.showModal = false;
                 this.selectionInfo = null;
                 this.selectedDate = null;
+                this.activeEvent.isDefault = false;
             },
             clearAllEvents: function(){
                 if(this.calendar !== undefined) {
@@ -373,18 +349,28 @@
                     };
                 }
                 event.id = this.getUniqueId();
-                let generatedEvent = this.calendar.addEvent(event);
-
+                let normalizedObject = this.normalizeEventObject(event);
+                console.log(normalizedObject);
+                let generatedEvent = this.calendar.addEvent(normalizedObject);
+                console.log(generatedEvent);
                 ipcRenderer.send('async-new-event', this.normalizeEventObject(generatedEvent));
             },
             /* Get the data-event of the corresponding defaultEvent */
             getEventData: function (title) {
-                let defaultEvent = this.defaultEvents.find(e => e.title === title);
+                let defaultEvent = this.getDefaultEvents.find(e => e.title === title);
                 return JSON.stringify(defaultEvent);
             },
             getEventBackgroundColor: function(title){
-                let defaultEvent = this.defaultEvents.find(e => e.title === title);
-                return 'background-color: ' + defaultEvent.color + '; border-color: ' + defaultEvent.color + ';';
+                let defaultEvent = this.getDefaultEvents.find(e => e.title === title);
+                let defaultEventColor = this.getEventColor(defaultEvent.extendedProps.type);
+                return 'background-color: ' + defaultEventColor + '; border-color: ' + defaultEventColor + ';';
+            },
+            getEventManagers: function(managers) {
+                let newManagers = [];
+                for(let m of managers) {
+                    newManagers.push(new Manager(m.code, m.fullName));
+                }
+                return newManagers;
             },
             normalizeEventObject: function (EventObject) {
                 return {
@@ -393,8 +379,8 @@
                     end: EventObject.end,
                     title: EventObject.title,
                     allDay: EventObject.allDay,
-                    backgroundColor: EventObject.backgroundColor !== undefined ? EventObject.backgroundColor : EventObject.color,
-                    borderColor: EventObject.borderColor !== undefined ? EventObject.borderColor : EventObject.color,
+                    backgroundColor: EventObject.backgroundColor !== (undefined && '') ? EventObject.backgroundColor : this.getEventColor(EventObject.extendedProps.type),
+                    borderColor: EventObject.borderColor !== (undefined && '') ? EventObject.borderColor : this.getEventColor(EventObject.extendedProps.type),
                     extendedProps: EventObject.extendedProps
                 };
             }
