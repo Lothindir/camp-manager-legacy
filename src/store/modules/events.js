@@ -5,6 +5,7 @@ const state = {
         {
             title: "Diane",
             duration: {minutes: 15},
+            color: 'RoyalBlue',
             extendedProps: {
                 managers: [new Manager('','')],
                 type: 'Diane',
@@ -24,6 +25,7 @@ const state = {
         {
             title: "Shhhhh'Time",
             duration: {minutes: 30},
+            color: 'LightCoral',
             extendedProps: {
                 managers: [new Manager('','')],
                 type: 'Shhhhh\'Time',
@@ -33,6 +35,7 @@ const state = {
         {
             title: "TAPS",
             duration: {minutes: 30},
+            color: 'MidnightBlue',
             extendedProps: {
                 managers: [new Manager('','')],
                 type: 'TAPS',
