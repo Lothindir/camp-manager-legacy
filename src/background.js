@@ -5,6 +5,7 @@ import {
     createProtocol,
     installVueDevtools
 } from 'vue-cli-plugin-electron-builder/lib';
+let path = require('path');
 const isDevelopment = process.env.NODE_ENV !== 'production';
 
 let Datastore = require('nedb');
@@ -13,15 +14,15 @@ let eventsDatabase = new Datastore({ filename: 'src/assets/database/events.db' }
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.
 let win;
-// let splashScreen;
+let splashScreen;
 
 // Scheme must be registered before the app is ready
 protocol.registerSchemesAsPrivileged([{scheme: 'app', privileges: { secure: true, standard: true } }]);
 
 function createWindow () {
     // Create the splash screen.
-    // splashScreen = new BrowserWindow({width: 810, height: 610, backgroundColor: '#1a202c', transparent: true, frame: false, alwaysOnTop: true, icon: 'src/assets/tent.ico', webPreferences: {nodeIntegration: true}});
-    // splashScreen.loadURL('file://dist/splash.html');
+    splashScreen = new BrowserWindow({width: 810, height: 600, transparent: true, frame: false, alwaysOnTop: true, icon: 'src/assets/tent.ico', webPreferences: {nodeIntegration: true}});
+    splashScreen.loadURL(path.join(__static, 'splash.html'));
 
     // Create the browser window.
     win = new BrowserWindow({ backgroundColor: '#1a202c',icon: 'src/assets/tent.ico', frame: false, title: 'Camp' +
@@ -46,7 +47,7 @@ function createWindow () {
     });
 
     win.once('ready-to-show', () => {
-        // splashScreen.destroy();
+        splashScreen.destroy();
         win.show();
     });
 }
