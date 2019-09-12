@@ -1,12 +1,18 @@
 'use strict';
 
 import { app, protocol, BrowserWindow, ipcMain } from 'electron';
+import { autoUpdater} from "electron-updater";
+import log  from 'electron-log';
 import {
     createProtocol,
     installVueDevtools
 } from 'vue-cli-plugin-electron-builder/lib';
 let path = require('path');
 const isDevelopment = process.env.NODE_ENV !== 'production';
+
+autoUpdater.logger = log;
+autoUpdater.logger.transports.file.level = 'info';
+log.info('App starting...');
 
 let Datastore = require('nedb');
 let eventsDatabase = new Datastore({ filename: 'src/assets/database/events.db' });
@@ -138,4 +144,9 @@ ipcMain.on('async-delete-event', (e, event) => {
    console.log('Deleting event');
    console.log(event);
    eventsDatabase.remove(event);
+});
+
+/************* Auto Update **********************/
+app.on('ready', function()  {
+    autoUpdater.checkForUpdatesAndNotify();
 });
