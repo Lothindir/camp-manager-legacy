@@ -2,8 +2,9 @@
   "name": "camp-manager",
   "description": "A camp manager made with Vue.js, Electron & TailwindCSS",
   "author": "Francesco Monti",
-  "version": "0.1.10",
+  "version": "0.1.11-beta",
   "license": "MIT",
+  "main": "background.js",
   "bugs": "https://github.com/Lothindir/camp-manager/issues",
   "repository": {
     "type": "git",
@@ -15,12 +16,12 @@
     "build": "vue-cli-service build",
     "lint": "vue-cli-service lint",
     "electron:build": "vue-cli-service electron:build",
+    "electron:release": "vue-cli-service electron:build -p always",
     "electron:serve": "vue-cli-service electron:serve",
     "postinstall": "electron-builder install-app-deps",
     "postuninstall": "electron-builder install-app-deps",
     "generate-icons": "vsvg -s ./static/svg/ -t ./src/icons"
   },
-  "main": "background.js",
   "dependencies": {
     "@fullcalendar/core": "^4.2.0",
     "@fullcalendar/daygrid": "^4.2.0",

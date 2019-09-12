@@ -1,12 +1,22 @@
 appId: "com.electron.camp-manager"
 productName: "Camp Manager"
+asar: true
+files:
+  - "src/background.js"
 win:
+  certificateFile: "Francesco Monti.pfx"
   target:
     - "nsis"
     - "portable"
+  publish:
+    - provider: "github"
+      owner: "Lothindir"
+      vPrefixedTagName: true
+      releaseType: "prerelease"
+      publishAutoUpdate: true
 nsis:
   oneClick: false
   allowToChangeInstallationDirectory: true
-  artifactName: "${productName} Setup beta-${version}.${ext}"
+  artifactName: "${productName} Setup v${version}.${ext}"
 portable:
-  artifactName: "${productName} Portable beta-${version}.${ext}"
+  artifactName: "${productName} Portable v${version}.${ext}"
