@@ -3,6 +3,11 @@ language: node_js
 node_js:
   - '12'
 
+sudo: required
+dist: xenial
+
+before_script:
+  - sudo snap install snapcraft --classic
+
 script:
-  - npm run electron:build
   - npm run electron:release

@@ -3,20 +3,26 @@ productName: "Camp Manager"
 asar: true
 files:
   - "src/background.js"
+
 win:
   certificateFile: "Francesco Monti.pfx"
   target:
     - "nsis"
     - "portable"
-  publish:
-    - provider: "github"
-      owner: "Lothindir"
-      vPrefixedTagName: true
-      releaseType: "draft"
-      publishAutoUpdate: true
 nsis:
   oneClick: false
   allowToChangeInstallationDirectory: true
   artifactName: "${productName} Setup v${version}.${ext}"
 portable:
   artifactName: "${productName} Portable v${version}.${ext}"
+snap:
+  confinement: classic
+  grade: devel
+  publish: "github"
+
+publish:
+  - provider: "github"
+    owner: "Lothindir"
+    vPrefixedTagName: true
+    releaseType: "draft"
+    publishAutoUpdate: true
