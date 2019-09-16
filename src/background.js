@@ -148,5 +148,7 @@ ipcMain.on('async-delete-event', (e, event) => {
 
 /************* Auto Update **********************/
 app.on('ready', function()  {
-    autoUpdater.checkForUpdatesAndNotify();
+    if(!isDevelopment) {
+        autoUpdater.checkForUpdatesAndNotify();
+    }
 });

@@ -12,7 +12,7 @@ win:
     - provider: "github"
       owner: "Lothindir"
       vPrefixedTagName: true
-      releaseType: "prerelease"
+      releaseType: "draft"
       publishAutoUpdate: true
 nsis:
   oneClick: false
