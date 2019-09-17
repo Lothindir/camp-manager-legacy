@@ -14,17 +14,11 @@ install:
   - ps: Install-Product node 10 x64
   - cmd: npm ci
 
-for:
-  -
-    on:
-      APPVEYOR_REPO_TAG: true
+build_script:
+  - cmd: npm run electron:release
 
-    build_script:
-    - cmd: npm run electron:release
-
-  -
+deploy:
+  - provider: Environement
+    name: GH_RELEASE
     on:
       APPVEYOR_REPO_TAG: false
-
-      build_script:
-      - cmd npm run electron:build
