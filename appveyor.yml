@@ -14,5 +14,17 @@ install:
   - ps: Install-Product node 10 x64
   - cmd: npm ci
 
-build_script:
-  - cmd: npm run electron:release
+for:
+  -
+    on:
+      APPVEYOR_REPO_TAG: true
+
+    build_script:
+    - cmd: npm run electron:release
+
+  -
+    on:
+      APPVEYOR_REPO_TAG: false
+
+      build_script:
+      - cmd npm run electron:build
