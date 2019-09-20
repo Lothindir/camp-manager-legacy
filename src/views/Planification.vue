@@ -48,7 +48,7 @@
                       :slot-label-format="slotLabelFormat"
                       :custom-buttons="getCustomButtons()"
                       :header="{
-                        center: 'addEventButton, clearAllEvents',
+                        center: 'addEventButton, clearAllEvents, exportCalendar',
                         right: 'weekTimeGridView, timeGridDay'
                         }"
                       :views="{ weekTimeGridView }"
@@ -70,11 +70,14 @@
     import interactionPlugin, { Draggable } from '@fullcalendar/interaction';
     import frLocale from '../assets/js/cm-fr';
     import AddEventModal from "../components/EventModal";
+    import jsPDF from 'jspdf';
+    import html2canvas from 'html2canvas';
 
     import { mapGetters } from 'vuex';
     import { Manager } from "../store/modules/events";
 
     const { ipcRenderer } = require('electron');
+    const fs = require('fs');
     let moment = require('moment');
     let cloneDeep = require('lodash.clonedeep');
 
@@ -183,6 +186,10 @@
                         clearAllEvents: {
                             text: "Effacer tout",
                             click: this.clearAllEvents
+                        },
+                        exportCalendar: {
+                            text: "Exporter en PDF",
+                            click: this.exportCalendarAsPDF
                         }
                     };
                 }
@@ -383,6 +390,67 @@
                     borderColor: EventObject.borderColor !== (undefined && '') ? EventObject.borderColor : this.getEventColor(EventObject.extendedProps.type),
                     extendedProps: EventObject.extendedProps
                 };
+            },
+            exportCalendarAsPDF: function () {
+                // function download(strData, strFileName, strMimeType) {
+                //     var D = document, A = arguments,
+                //         a = D.createElement("a"),
+                //         d = A[0],
+                //         n = A[1],
+                //         t = A[2] || "text/plain";
+                //
+                //     //build download link:
+                //     a.href = "data:" + strMimeType + "," + escape(strData);
+                //
+                //     if (window.MSBlobBuilder) {
+                //         var bb = new MSBlobBuilder();
+                //         bb.append(strData);
+                //         return navigator.msSaveBlob(bb, strFileName);
+                //     } /* end if(window.MSBlobBuilder) */
+                //
+                //     if ('download' in a) {
+                //         a.setAttribute("download", n);
+                //         a.innerHTML = "downloading...";
+                //         D.body.appendChild(a);
+                //         setTimeout(function() {
+                //             var e = D.createEvent("MouseEvents");
+                //             e.initMouseEvent("click", true, false, window, 0, 0, 0, 0, 0, false, false,
+                //                 false, false, 0, null);
+                //             a.dispatchEvent(e);
+                //             D.body.removeChild(a);
+                //         }, 66);
+                //         return true;
+                //     } /* end if('download' in a) */
+                //
+                //     //do iframe dataURL download:
+                //     var f = D.createElement("iframe");
+                //     D.body.appendChild(f);
+                //     f.src = "data:" + (A[2] ? A[2] : "application/octet-stream") + (window.btoa ? ";base64"
+                //         : "") + "," + (window.btoa ? window.btoa : escape)(strData);
+                //     setTimeout(function() {
+                //         D.body.removeChild(f);
+                //     }, 333);
+                //     return true;
+                // } /*end download() */
+
+                let calendarEl = document.getElementById('calendar');
+
+                html2canvas(calendarEl, {
+                    logging: true,
+                    useCORS: true
+                }).then(function (canvas) {
+                    var imgData = canvas.toDataURL("image/jpeg");
+                    var doc = new jsPDF();
+                    doc.addImage(imgData, 'JPEG', 15, 40, 180, 160);
+                    try {
+                        fs.writeFileSync("calendar.pdf", doc.output(), "utf-8");
+                        alert("PDF saved");
+                    } catch (e) {
+                        alert("Error while saving" + e);
+                    }
+                    // download(doc.output(), "Calendar.pdf", "text/pdf");
+
+                });
             }
         }
     }
