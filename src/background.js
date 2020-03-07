@@ -27,11 +27,12 @@ protocol.registerSchemesAsPrivileged([{scheme: 'app', privileges: { secure: true
 
 function createWindow () {
     // Create the splash screen.
-    splashScreen = new BrowserWindow({width: 810, height: 600, transparent: true, frame: false, alwaysOnTop: true, icon: 'src/assets/tent.ico', webPreferences: {nodeIntegration: true}});
+    splashScreen = new BrowserWindow({ width: 810, height: 600, transparent: true, frame: false, alwaysOnTop: true, icon: 'src/assets/camp-manager.ico', webPreferences: { nodeIntegration: true } });
     splashScreen.loadURL(path.join(__static, 'splash.html'));
 
     // Create the browser window.
-    win = new BrowserWindow({ backgroundColor: '#1a202c',icon: 'src/assets/tent.ico', frame: false, title: 'Camp' +
+    win = new BrowserWindow({
+        backgroundColor: '#1a202c', icon: 'src/assets/camp-manager.ico', frame: false, title: 'Camp' +
             ' Manager', width: 1200, height: 875, webPreferences: {
             nodeIntegration: true
         }, show: false });
