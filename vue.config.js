@@ -1,39 +1,27 @@
-const HtmlWebpackPlugin = require('html-webpack-plugin')
-
 module.exports = {
-  lintOnSave: false,
-  pluginOptions: {
-    electronBuilder: {
-      outputDir: 'dist'
-    }
-  },
-  chainWebpack: config => {
-    config
-      .entry('app')
-      .clear();
-    config
-      .entry('startup')
-      .add('./src/startup/main.js')
-      .end()
-    config
-      .entry('main')
-      .add('./src/main/main.js')
-      .end()
-
-    config
-    .plugin('html')
-    .tap(args => {
-      args[0].excludeChunks = ['app','startup']
-      return args
-    })
-    config
-      .plugin('html-startup')
-      .use(HtmlWebpackPlugin, [{  // Also generate a test.html
-        filename: 'startup.html',
-        title: 'Welcome to Camp Manager',
-        template: 'public/startup.html',
-        inject: true,
-        excludeChunks: ['app','main']
-      }])
+  pages: {
+    mainwindow: {
+      // entry for the page
+      entry: 'src/windows/MainWindow/main.ts',
+      // the source template
+      template: 'public/main-window.html',
+      // output as dist/index.html
+      filename: 'main-window.html',
+      // when using title option,
+      // template title tag needs to be <title><%= htmlWebpackPlugin.options.title %></title>
+      //title: 'Index Page',
+      // chunks to include on this page, by default includes
+      // extracted common chunks and vendor chunks.
+      //chunks: ['chunk-vendors', 'chunk-common', 'index']
+    },
+    // when using the entry-only string format,
+    // template is inferred to be `public/subpage.html`
+    // and falls back to `public/index.html` if not found.
+    // Output filename is inferred to be `subpage.html`.
+    startupWindow: {
+      entry: 'src/windows/StartupWindow/main.ts',
+      template: 'public/startup-window.html',
+      filename: 'startup-window.html',
+    },
   }
 }
