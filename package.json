@@ -1,27 +1,21 @@
 {
   "name": "camp-manager",
+  "version": "1.0.1-beta",
+  "private": false,
   "description": "A camp manager made with Vue.js, Electron & TailwindCSS",
   "author": "Francesco Monti",
-  "version": "1.0.1-beta",
-  "license": "MIT",
-  "bugs": "https://github.com/Lothindir/camp-manager/issues",
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/Lothindir/camp-manager.git"
-  },
-  "private": false,
   "scripts": {
-    "start": "electron .",
-    "pack": "electron-builder --dir -c electron-builder.yml",
-    "dist": "electron-builder -c electron-builder.yml",
     "serve": "vue-cli-service serve",
     "build": "vue-cli-service build",
+    "test:unit": "vue-cli-service test:unit",
+    "lint": "vue-cli-service lint",
     "build:dev": "vue-cli-service build --mode development",
     "build:mainproc": "webpack-cli --mode=development --config webpack.mainproc.config.js",
     "clean": "rm -rf ./dist && rm -rf ./bin && rm -rf ./dist.electron",
-    "lint": "vue-cli-service lint",
-    "test": "npm run test:unit",
-    "test:unit": "vue-cli-service test:unit"
+    "dist": "electron-builder -c electron-builder.yml",
+    "pack": "electron-builder --dir -c electron-builder.yml",
+    "start": "electron .",
+    "test": "npm run test:unit"
   },
   "dependencies": {
     "vue": "^2.6.11",
@@ -45,7 +39,14 @@
     "sass-loader": "^8.0.2",
     "source-map-loader": "^0.2.4",
     "typescript": "^3.7.5",
+    "vue-cli-plugin-tailwind": "~1.2.0",
     "vue-template-compiler": "^2.6.11",
     "webpack-cli": "^3.3.11"
+  },
+  "bugs": "https://github.com/Lothindir/camp-manager/issues",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Lothindir/camp-manager.git"
   }
 }
