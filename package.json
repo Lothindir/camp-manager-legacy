@@ -15,7 +15,8 @@
     "dist": "electron-builder -c electron-builder.yml",
     "pack": "electron-builder --dir -c electron-builder.yml",
     "start": "electron .",
-    "test": "npm run test:unit"
+    "test": "npm run test:unit",
+    "generate-icons": "vsvg -s ./static/svg/ -t ./src/assets/icons"
   },
   "dependencies": {
     "vue": "^2.6.11",
@@ -40,6 +41,7 @@
     "source-map-loader": "^0.2.4",
     "typescript": "^3.7.5",
     "vue-cli-plugin-tailwind": "~1.2.0",
+    "vue-svgicon": "^3.2.6",
     "vue-template-compiler": "^2.6.11",
     "webpack-cli": "^3.3.11"
   },

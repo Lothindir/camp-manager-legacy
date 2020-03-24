@@ -64,7 +64,7 @@ export default class Main {
     }
 
     private static createStartupWindow() {
-        let startupWindow = new StartupWindow({ frame: true })
+        let startupWindow = new StartupWindow()
 
         startupWindow.window.once('ready-to-show', () => {
             console.log('[Startup} Closing splashscreen');
@@ -79,7 +79,7 @@ export default class Main {
     }
 
     private static createMainWindow() {
-        let mainWindow = new MainWindow({frame: true});
+        let mainWindow = new MainWindow();
 
         mainWindow.window.once('ready-to-show', () => {
             Main.splashWindow.close(mainWindow.window);
