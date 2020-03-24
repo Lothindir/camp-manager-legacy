@@ -16,16 +16,36 @@ export default class SplashScreen {
     icon: path.join(app.getAppPath(), 'src/assets/camp-manager.ico'),
   }
 
-  public splashScreen: BrowserWindow
+  protected timestamp: number
+  protected minDelay: number
 
-  constructor(options?: Electron.BrowserWindowConstructorOptions) {
+  public splashScreen: BrowserWindow | null
+
+  constructor(options?: Electron.BrowserWindowConstructorOptions, minDelay: number = 1000) {
     // Create the browser window.
     this.splashScreen = new BrowserWindow({
       ...this.windowOptions,
       ...options
     });
 
+    this.minDelay = minDelay;
+
     // and load the html of the app.
     this.splashScreen.loadFile(path.join(app.getAppPath(), `dist/splash-window.html`));
+
+    this.timestamp = + new Date();
+  }
+
+  public close(main: BrowserWindow) {
+    if(this.splashScreen) {
+      const timeout = this.minDelay - (+ new Date() - this.timestamp);
+      setTimeout(() => {
+        if(this.splashScreen) {
+          this.splashScreen.isDestroyed() || this.splashScreen.close();
+          this.splashScreen = null;
+        }
+        main.show();
+      }, timeout);
+    }
   }
 }

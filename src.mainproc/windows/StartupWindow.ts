@@ -13,18 +13,19 @@ export default class StartupWindow{
         },
         width: 800,
         height: 600,
+        show: false
     }
 
-    public startupWindow: BrowserWindow
+    public window: BrowserWindow
 
     constructor(options?: Electron.BrowserWindowConstructorOptions) {
         // Create the browser window.
-        this.startupWindow = new BrowserWindow({
+        this.window = new BrowserWindow({
             ...this.windowOptions,
             ...options
         });
 
         // and load the html of the app.
-        this.startupWindow.loadFile(path.join(app.getAppPath(), `dist/startup-window.html`));
+        this.window.loadFile(path.join(app.getAppPath(), `dist/startup-window.html`));
     }
 }

@@ -16,16 +16,16 @@ export default class MainWindow{
         show: false
     }
 
-    public mainWindow: BrowserWindow
+    public window: BrowserWindow
 
     constructor(options?: Electron.BrowserWindowConstructorOptions) {
         // Create the browser window.
-        this.mainWindow = new BrowserWindow({
+        this.window = new BrowserWindow({
             ...this.windowOptions,
             ...options
         });
 
         // and load the html of the app.
-        this.mainWindow.loadFile(path.join(app.getAppPath(), `dist/main-window.html`));
+        this.window.loadFile(path.join(app.getAppPath(), `dist/main-window.html`));
     }
 }

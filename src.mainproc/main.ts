@@ -2,7 +2,7 @@
 // Modules to control application life and create native browser window
 import * as url from 'url';
 import * as path from 'path';
-import { app, protocol, BrowserWindow } from 'electron';
+import { app, protocol, ipcMain } from 'electron';
 
 import SplashWindow from './windows/SplashWindow';
 import StartupWindow from './windows/StartupWindow';
@@ -20,30 +20,38 @@ export default class Main {
     private static application: Electron.App
 
     // Windows declarations
-    static splashWindow: BrowserWindow | null
-    static startupWindow: BrowserWindow | null
-    static mainWindow: BrowserWindow | null
-    static BrowserWindow: typeof BrowserWindow
+    static splashWindow: SplashWindow
+    static startupWindow: StartupWindow
+    static mainWindow: MainWindow
+    //static BrowserWindow: typeof BrowserWindow
 
-    public static main(app: Electron.App, browserWindow: typeof BrowserWindow) {
-        Main.BrowserWindow = browserWindow;
+    public static main(app: Electron.App/*, browserWindow: typeof BrowserWindow*/) {
+        //Main.BrowserWindow = browserWindow;
         Main.application = app;
 
         Main.application.on('window-all-closed', Main.onWindowAllClosed);
         Main.application.on('ready', Main.onReady);
         Main.application.on('activate', Main.onActivate);
+
+        ipcMain.on('createMainWindow', () => {
+            Main.startupWindow.window.hide();
+            Main.splashWindow = new SplashWindow();
+            Main.startupWindow.window.close();
+            this.createMainWindow();
+        })
     }
 
     private static onReady() {
         Main.interceptFileProtocol();
 
-        Main.splashWindow = new SplashWindow().splashScreen
+        Main.splashWindow = new SplashWindow()
+        Main.createStartupWindow();
     }
 
     private static onActivate() {
         // On macOS it's common to re-create a window in the app when the
         // dock icon is clicked and there are no other windows open.
-        Main.mainWindow = new MainWindow().mainWindow;
+        Main.mainWindow = new MainWindow();
     }
 
     // Quit when all windows are closed.
@@ -53,6 +61,35 @@ export default class Main {
         if (process.platform !== 'darwin') {
             Main.application.quit();
         }
+    }
+
+    private static createStartupWindow() {
+        let startupWindow = new StartupWindow({ frame: true })
+
+        startupWindow.window.once('ready-to-show', () => {
+            console.log('[Startup} Closing splashscreen');
+            Main.splashWindow.close(startupWindow.window);
+        });
+
+        startupWindow.window.on('closed', () => {
+            console.log('[Startup] Window closed');
+        });
+
+        Main.startupWindow = startupWindow;
+    }
+
+    private static createMainWindow() {
+        let mainWindow = new MainWindow({frame: true});
+
+        mainWindow.window.once('ready-to-show', () => {
+            Main.splashWindow.close(mainWindow.window);
+        });
+
+        mainWindow.window.on('closed', () => {
+            console.log('[Main] Window closed');
+        });
+
+        Main.mainWindow = mainWindow;
     }
 
     private static interceptFileProtocol() {
@@ -81,4 +118,4 @@ export default class Main {
     }
 }
 
-Main.main(app, BrowserWindow);
+Main.main(app/*, BrowserWindow*/);
