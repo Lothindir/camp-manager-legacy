@@ -1,3 +1,5 @@
+directories:
+  output: dist.electron
 appId: "com.electron.camp-manager"
 productName: "Camp Manager"
 asar: true
