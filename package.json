@@ -1,6 +1,6 @@
 {
   "name": "camp-manager",
-  "version": "1.0.1-beta",
+  "version": "0.2.1-beta",
   "private": false,
   "description": "A camp manager made with Vue.js, Electron & TailwindCSS",
   "author": "Francesco Monti",
