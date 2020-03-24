@@ -1,12 +1,8 @@
-
 import * as path from 'path';
-import { app, BrowserWindow, shell } from 'electron';
-import { registerWindow, unregisterWindow, isRegistered, getWindow } from '../lib/SimpleWindowManager';
+import { app, BrowserWindow } from 'electron';
 
-// Create the splash screen.
-export function createSplashScreen() {
-
-  let splashWindow: BrowserWindow | null = new BrowserWindow({
+export default class SplashScreen {
+  protected windowOptions: Electron.BrowserWindowConstructorOptions = {
     webPreferences: {
       nodeIntegration: false,
     },
@@ -17,10 +13,19 @@ export function createSplashScreen() {
     alwaysOnTop: true,
     resizable: false,
     movable: false,
-    icon: path.join(app.getAppPath(),'src/assets/icon.png')
-  });
-  registerWindow(splashWindow, splashWindow);
+    icon: path.join(app.getAppPath(), 'src/assets/camp-manager.ico'),
+  }
 
-  // and load the html of the app.
-  splashWindow.loadFile(path.join(app.getAppPath(), 'dist/splash-window.html'));
+  public splashScreen: BrowserWindow
+
+  constructor(options?: Electron.BrowserWindowConstructorOptions) {
+    // Create the browser window.
+    this.splashScreen = new BrowserWindow({
+      ...this.windowOptions,
+      ...options
+    });
+
+    // and load the html of the app.
+    this.splashScreen.loadFile(path.join(app.getAppPath(), `dist/splash-window.html`));
+  }
 }
