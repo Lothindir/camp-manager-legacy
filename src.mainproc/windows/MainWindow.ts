@@ -1,7 +1,8 @@
 
 import * as path from 'path';
 import { app, BrowserWindow, shell } from 'electron';
-import { registerWindow, unregisterWindow, isRegistered, getWindow } from '../lib/SimpleWindowManager';
+import * as url from 'url';
+//import { registerWindow, unregisterWindow, isRegistered, getWindow } from '../lib/SimpleWindowManager';
 
 
 
@@ -13,27 +14,39 @@ const mainWindowSymbol = Symbol();
 
 export function createMainWindow() {
     // MainWindow is singleton.
-    if (isRegistered(mainWindowSymbol)) {
+    /*if (isRegistered(mainWindowSymbol)) {
         return getWindow(mainWindowSymbol);
-    }
+    }*/
 
     // Create the browser window.
     let mainWindow: BrowserWindow | null = new BrowserWindow({
+        backgroundColor: '#1a202c',
+        icon: path.join(app.getAppPath(), 'src/assets/camp-manager.ico'),
+        frame: false,
+        title: 'Camp Manager',
+        width: 1200,
+        height: 875,
         webPreferences: {
-            nodeIntegration: false,
-            preload: path.join(app.getAppPath(), 'src.preload/preload.js'),
+            //nodeIntegration: false,
+            //preload: path.join(app.getAppPath(), 'src.preload/preload.js'),
+            webSecurity: false,
         },
-        width: 800,
-        height: 600,
+        show: true
     });
-    registerWindow(mainWindowSymbol, mainWindow);
+    //registerWindow(mainWindowSymbol, mainWindow);
 
     // and load the html of the app.
-    mainWindow.loadFile(path.join(app.getAppPath(), 'dist/main-window.html'));
+    // mainWindow.loadFile(path.join(app.getAppPath(), `dist/main-window.html`));
+    // mainWindow.loadFile(`dist/main-window.html`);
+    mainWindow.loadURL(url.format({
+        pathname: path.join(app.getAppPath(), 'dist/main-window.html'),
+        protocol: 'file',
+        slashes: true
+    }))
 
     // CSP is not work while the location scheme is 'file'.
     // And when if navigated to http/https, CSP is to be enabled.
-    if (app.isPackaged) {
+    /*if (app.isPackaged) {
         mainWindow.webContents.session.webRequest.onHeadersReceived((details: any, callback: any) => {
             callback({
                 responseHeaders: {
@@ -67,7 +80,7 @@ export function createMainWindow() {
         //     return callback(false);
         // }
         return callback(false);
-    });
+    });*/
 
     // Open the DevTools.
     // mainWindow.webContents.openDevTools()
@@ -77,16 +90,16 @@ export function createMainWindow() {
         // Dereference the window object, usually you would store windows
         // in an array if your app supports multi windows, this is the time
         // when you should delete the corresponding element.
-        unregisterWindow(mainWindowSymbol);
+        //unregisterWindow(mainWindowSymbol);
         mainWindow = null;
     });
 
-    mainWindow.webContents.on('new-window', (event: any, url: string) => {
+    /*mainWindow.webContents.on('new-window', (event: any, url: string) => {
         event.preventDefault();
         if (url.match(/^https?:\/\//)) {
             shell.openExternal(url);
         }
-    });
+    });*/
 
     return mainWindow;
 }

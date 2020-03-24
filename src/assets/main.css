@@ -49,7 +49,7 @@ router-link {
 
 @font-face {
     font-family: Quicksand;
-    src: url("fonts/Quicksand.ttf") format('truetype');
+    src: url('fonts/Quicksand.ttf') format('truetype');
 }
 
 @tailwind components;

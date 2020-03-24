@@ -3,9 +3,9 @@ productName: "Camp Manager"
 asar: true
 
 win:
-  certificateFile: "Francesco Monti.pfx"
+  #certificateFile: "Francesco Monti.pfx"
   target:
-    - "nsis"
+    #- "nsis"
     - "portable"
 nsis:
   oneClick: false

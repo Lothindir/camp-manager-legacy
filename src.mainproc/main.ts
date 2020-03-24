@@ -7,7 +7,7 @@ import { app, protocol } from 'electron';
 
 // Window
 
-import { createSplashScreen } from './windows/SplashWindow';
+import { createMainWindow } from './windows/MainWindow';
 
 
 // IPC events
@@ -28,23 +28,23 @@ app.on('ready', function() {
             if (filePath.match(/^\/[A-Za-z]:/)) {
                 filePath = filePath.slice(1);
             }
-            if (filePath.match(/^[A-Za-z]:\/(css|img|js)/)) {
+            if (filePath.match(/^[A-Za-z]:\/(css|img|js|ttf)/)) {
                 filePath = path.join(app.getAppPath(), 'dist', filePath.slice(3));
-            } else if (filePath.match(/^[A-Za-z]:\/[^/\\]+?\.(js|css|png|jpeg|jpg|ico|svg)$/)) {
+            } else if (filePath.match(/^[A-Za-z]:\/[^/\\]+?\.(js|css|png|jpeg|jpg|ico|svg|ttf)$/)) {
                 // case of "vue-cli-service build --mode development"
                 filePath = path.join(app.getAppPath(), 'dist', filePath.slice(3));
             }
         } else {
-            if (filePath.match(/^\/(css|img|js)/)) {
+            if (filePath.match(/^\/(css|img|js|ttf)/)) {
                 filePath = path.join(app.getAppPath(), 'dist', filePath.slice(1));
-            } else if (filePath.match(/^\/[^/\\]+?\.(js|css|png|jpeg|jpg|ico|svg)$/)) {
+            } else if (filePath.match(/^\/[^/\\]+?\.(js|css|png|jpeg|jpg|ico|svg|ttf)$/)) {
                 // case of "vue-cli-service build --mode development"
                 filePath = path.join(app.getAppPath(), 'dist', filePath.slice(1));
             }
         }
         callback(path.normalize(filePath));
     });
-    createSplashScreen();
+    createMainWindow();
 });
 
 
@@ -63,7 +63,7 @@ app.on('window-all-closed', function() {
 app.on('activate', function() {
     // On macOS it's common to re-create a window in the app when the
     // dock icon is clicked and there are no other windows open.
-    createSplashScreen();
+    createMainWindow();
 });
 
 

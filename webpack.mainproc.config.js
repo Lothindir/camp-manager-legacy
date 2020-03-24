@@ -5,6 +5,10 @@ var webpack = require('webpack');
 
 module.exports = function (env) {
     return [{
+        node: {
+            __filename: false,
+            __dirname: false,
+        },
         target: "electron-main",
         entry: {
             spec: [
@@ -19,10 +23,6 @@ module.exports = function (env) {
             path: path.resolve(__dirname, 'bin'),
             devtoolModuleFilenameTemplate: '../[resource-path]',
             // devtoolModuleFilenameTemplate: void 0
-        },
-        node: {
-            __filename: false,
-            __dirname: false,
         },
         module: {
             rules: [{
@@ -55,5 +55,4 @@ module.exports = function (env) {
         },
         devtool: 'source-map'
     },
-
 ]}
