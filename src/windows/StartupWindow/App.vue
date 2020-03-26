@@ -11,7 +11,7 @@
 </template>
 
 <script lang="ts">
-import Titlebar from '../../components/Titlebar.vue';
+import Titlebar from '@/components/Titlebar.vue';
 import { IpcRenderer } from 'electron';
 declare var ipcRenderer: IpcRenderer;
 

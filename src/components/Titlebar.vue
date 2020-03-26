@@ -24,7 +24,7 @@
 <script lang="ts">
 import { Vue, Component, Prop } from 'vue-property-decorator';
 import { Remote } from 'electron';
-import '../assets/icons/zondicons';
+import '@/assets/icons/zondicons';
 declare var remote: Remote;
 
 @Component

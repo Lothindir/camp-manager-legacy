@@ -6,23 +6,22 @@
   >
     <Titlebar></Titlebar>
     <Sidebar></Sidebar>
-    <div class="ml-12 pl-4">Main Window</div>
+    <router-view class="ml-12 pl-2" />
   </div>
 </template>
 
 <script lang="ts">
-import { Vue, Component } from 'vue-property-decorator';
-import Titlebar from '@/components/Titlebar.vue';
-import Sidebar from '@/components/Sidebar.vue';
+import { Vue, Component } from "vue-property-decorator";
+import Titlebar from "@/components/Titlebar.vue";
+import Sidebar from "@/components/Sidebar.vue";
 
 @Component({
   components: {
     Titlebar,
-    Sidebar,
-  },
+    Sidebar
+  }
 })
-export default class App extends Vue {
-}
+export default class App extends Vue {}
 </script>
 
 <style src="../../assets/main.css"></style>
