@@ -12,7 +12,7 @@ module.exports = function (env) {
         target: "electron-main",
         entry: {
             spec: [
-                path.resolve(__dirname, 'src.mainproc/main.ts')
+                path.resolve(__dirname, 'src.mainproc/Main.ts')
             ]
         },
         output: {
