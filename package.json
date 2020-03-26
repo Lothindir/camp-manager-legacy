@@ -16,7 +16,7 @@
     "pack": "electron-builder --dir -c electron-builder.yml",
     "start": "electron .",
     "test": "npm run test:unit",
-    "generate-icons": "vsvg -s ./static/svg/ -t ./src/assets/icons"
+    "generate-icons": "vsvg -s ./static/svg/ -t ./src/assets/icons --ext ts"
   },
   "dependencies": {
     "vue": "^2.6.11",

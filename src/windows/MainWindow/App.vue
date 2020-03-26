@@ -5,16 +5,24 @@
     class="flex h-screen bg-gray-900 select-none pt-8 border border-black overflow-hidden font-quicksand"
   >
     <Titlebar></Titlebar>
-    <div>Main Window</div>
+    <Sidebar></Sidebar>
+    <div class="ml-12 pl-4">Main Window</div>
   </div>
 </template>
 
 <script lang="ts">
-import Titlebar from '../../components/Titlebar.vue';
+import { Vue, Component } from 'vue-property-decorator';
+import Titlebar from '@/components/Titlebar.vue';
+import Sidebar from '@/components/Sidebar.vue';
 
-export default {
-  components: { Titlebar }
-};
+@Component({
+  components: {
+    Titlebar,
+    Sidebar,
+  },
+})
+export default class App extends Vue {
+}
 </script>
 
 <style src="../../assets/main.css"></style>
