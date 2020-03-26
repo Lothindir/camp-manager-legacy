@@ -20,9 +20,8 @@ export default {
   methods: {
       openMain() {
           ipcRenderer.send('createMainWindow');
-          console.log('createMainWindow');
-      }
-  }
+      },
+  },
 };
 </script>
 

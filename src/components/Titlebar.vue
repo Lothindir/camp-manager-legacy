@@ -22,46 +22,44 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component, Prop } from "vue-property-decorator";
-
-import "../assets/icons/zondicons";
-import { Remote } from "electron";
+import { Vue, Component, Prop } from 'vue-property-decorator';
+import { Remote } from 'electron';
+import '../assets/icons/zondicons';
 declare var remote: Remote;
 
 @Component
 export default class Titlebar extends Vue {
-  @Prop({ default: "Camp Manager" }) title!: string;
-  @Prop({ default: true }) resizable!: boolean;
+  @Prop({ default: 'Camp Manager' }) public title!: string;
+  @Prop({ default: true }) public resizable!: boolean;
 
-  windowSizeIcon: string = this.getWindowSizeIcon();
+  public windowSizeIcon: string = this.getWindowSizeIcon();
 
-  created() {
-    this.getWindow().on("maximize", () => {
+  public created() {
+    this.getWindow().on('maximize', () => {
       this.windowSizeIcon = this.getWindowSizeIcon();
-      console.log("Received maximize event");
     });
-    this.getWindow().on("unmaximize", () => {
+    this.getWindow().on('unmaximize', () => {
       this.windowSizeIcon = this.getWindowSizeIcon();
     });
 
     this.getWindow().setResizable(this.resizable);
   }
 
-  getWindow() {
+  public getWindow() {
     return remote.getCurrentWindow();
   }
 
-  getWindowSizeIcon() {
+  public getWindowSizeIcon() {
     return this.getWindow().isMaximized()
-      ? "zondicons/edit-copy"
-      : "zondicons/browser-window";
+      ? 'zondicons/edit-copy'
+      : 'zondicons/browser-window';
   }
 
-  minimizeWindow() {
+  public minimizeWindow() {
     this.getWindow().minimize();
   }
 
-  changeWindowSize() {
+  public changeWindowSize() {
     if (this.getWindow().isMaximized()) {
       this.getWindow().restore();
     } else {
@@ -70,7 +68,7 @@ export default class Titlebar extends Vue {
     this.windowSizeIcon = this.getWindowSizeIcon();
   }
 
-  closeWindow() {
+  public closeWindow() {
     this.getWindow().close();
   }
 }

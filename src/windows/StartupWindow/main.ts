@@ -6,7 +6,7 @@ import SvgIcon from 'vue-svgicon';
 Vue.config.productionTip = false;
 
 Vue.use(SvgIcon, {
-    tagName: 'svgicon'
+    tagName: 'svgicon',
 });
 
 new Vue({
