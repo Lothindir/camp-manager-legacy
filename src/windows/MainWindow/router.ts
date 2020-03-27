@@ -11,7 +11,7 @@ const router = new Router({
         {
             path: '/',
             name: 'planification',
-            component: Planification
+            component: Planification,
         },
         {
             path: '/participants',

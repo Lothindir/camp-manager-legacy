@@ -11,15 +11,15 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component } from "vue-property-decorator";
-import Titlebar from "@/components/Titlebar.vue";
-import Sidebar from "@/components/Sidebar.vue";
+import { Vue, Component } from 'vue-property-decorator';
+import Titlebar from '@/components/Titlebar.vue';
+import Sidebar from '@/components/Sidebar.vue';
 
 @Component({
   components: {
     Titlebar,
-    Sidebar
-  }
+    Sidebar,
+  },
 })
 export default class App extends Vue {}
 </script>
