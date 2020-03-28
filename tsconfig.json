@@ -20,7 +20,8 @@
     // "noUnusedParameters": true,
     // "noUnusedLocals": true,
     // "noFallthroughCasesInSwitch": true,
-
+    
+    "typeRoots": ["./node_modules/@types", "./typings"],
     "baseUrl": ".",
     "types": [
       "webpack-env",

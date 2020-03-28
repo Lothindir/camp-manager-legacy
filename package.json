@@ -24,6 +24,7 @@
     "@fullcalendar/moment": "^4.4.0",
     "@fullcalendar/timegrid": "^4.4.0",
     "@fullcalendar/vue": "^4.4.0",
+    "@types/fullcalendar__vue": "^4.4.0",
     "nedb": "^1.8.0",
     "vue": "^2.6.11",
     "vue-class-component": "^7.2.3",
