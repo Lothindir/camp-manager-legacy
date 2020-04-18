@@ -1,12 +1,10 @@
-
 // Modules to control application life and create native browser window
 import * as url from 'url';
 import * as path from 'path';
 import { app, protocol, ipcMain } from 'electron';
 
+import GenericWindow from './windows/GenericWindow';
 import SplashWindow from './windows/SplashWindow';
-import StartupWindow from './windows/StartupWindow';
-import MainWindow from './windows/MainWindow';
 
 // IPC events
 
@@ -21,8 +19,8 @@ export default class Main {
 
     // Windows declarations
     static splashWindow: SplashWindow
-    static startupWindow: StartupWindow
-    static mainWindow: MainWindow
+    static startupWindow: GenericWindow
+    static mainWindow: GenericWindow
     //static BrowserWindow: typeof BrowserWindow
 
     public static main(app: Electron.App/*, browserWindow: typeof BrowserWindow*/) {
@@ -51,7 +49,7 @@ export default class Main {
     private static onActivate() {
         // On macOS it's common to re-create a window in the app when the
         // dock icon is clicked and there are no other windows open.
-        Main.mainWindow = new MainWindow();
+        Main.mainWindow = new GenericWindow('dist/main-window.html');
     }
 
     // Quit when all windows are closed.
@@ -64,7 +62,11 @@ export default class Main {
     }
 
     private static createStartupWindow() {
-        let startupWindow = new StartupWindow()
+        let startupWindow = new GenericWindow('dist/startup-window.html', {
+            title: 'Welcome to Camp Manager',
+            width: 800,
+            height: 600
+        });
 
         startupWindow.window.once('ready-to-show', () => {
             console.log('[Startup} Closing splashscreen');
@@ -79,7 +81,7 @@ export default class Main {
     }
 
     private static createMainWindow() {
-        let mainWindow = new MainWindow();
+        let mainWindow = new GenericWindow('dist/main-window.html');
 
         mainWindow.window.once('ready-to-show', () => {
             Main.splashWindow.close(mainWindow.window);
