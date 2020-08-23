@@ -2,7 +2,7 @@
 // Modules to control application life and create native browser window
 import * as url from 'url';
 import * as path from 'path';
-import { app, protocol, ipcMain } from 'electron';
+import { app, protocol, ipcMain, globalShortcut } from 'electron';
 
 import SplashWindow from './windows/SplashWindow';
 import StartupWindow from './windows/StartupWindow';
@@ -99,16 +99,16 @@ export default class Main {
                 if (filePath.match(/^\/[A-Za-z]:/)) {
                     filePath = filePath.slice(1);
                 }
-                if (filePath.match(/^[A-Za-z]:\/(css|img|js|ttf)/)) {
+                if (filePath.match(/^[A-Za-z]:\/(css|img|js)/)) {
                     filePath = path.join(Main.application.getAppPath(), 'dist', filePath.slice(3));
-                } else if (filePath.match(/^[A-Za-z]:\/[^/\\]+?\.(js|css|png|jpeg|jpg|ico|svg|ttf)$/)) {
+                } else if (filePath.match(/^[A-Za-z]:\/[^/\\]+?\.(js|css|png|jpeg|jpg|ico|svg)$/)) {
                     // case of "vue-cli-service build --mode development"
                     filePath = path.join(Main.application.getAppPath(), 'dist', filePath.slice(3));
                 }
             } else {
-                if (filePath.match(/^\/(css|img|js|ttf)/)) {
+                if (filePath.match(/^\/(css|img|js)/)) {
                     filePath = path.join(Main.application.getAppPath(), 'dist', filePath.slice(1));
-                } else if (filePath.match(/^\/[^/\\]+?\.(js|css|png|jpeg|jpg|ico|svg|ttf)$/)) {
+                } else if (filePath.match(/^\/[^/\\]+?\.(js|css|png|jpeg|jpg|ico|svg)$/)) {
                     // case of "vue-cli-service build --mode development"
                     filePath = path.join(Main.application.getAppPath(), 'dist', filePath.slice(1));
                 }

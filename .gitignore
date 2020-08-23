@@ -59,3 +59,7 @@ build/Release
 *.njsproj
 *.sln
 *.sw*
+
+#Electron-builder output
+/dist_electron
+src/background.ts

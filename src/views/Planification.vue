@@ -1,5 +1,5 @@
 <template>
-  
+  <div class="pt-10 text-gray-500">Planification</div>
 </template>
 
 <script lang="ts">
