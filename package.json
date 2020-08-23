@@ -15,6 +15,7 @@
     "dist": "electron-builder -c electron-builder.yml",
     "pack": "electron-builder --dir -c electron-builder.yml",
     "start": "electron .",
+    "dev": "nodemon --watch src --ext * --exec \"npm run build:dev && npm run start\"",
     "test": "npm run test:unit",
     "generate-icons": "vsvg -s ./static/svg/ -t ./src/assets/icons --ext ts"
   },
@@ -46,6 +47,7 @@
     "electron": "^9.2.1",
     "electron-builder": "^22.8.0",
     "node-sass": "^4.14.1",
+    "nodemon": "^2.0.4",
     "sass-loader": "^9.0.3",
     "source-map-loader": "^1.0.2",
     "typescript": "^4.0.2",
