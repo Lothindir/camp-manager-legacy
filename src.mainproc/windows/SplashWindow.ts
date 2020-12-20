@@ -4,7 +4,7 @@ import { app, BrowserWindow } from 'electron';
 export default class SplashScreen {
   protected windowOptions: Electron.BrowserWindowConstructorOptions = {
     webPreferences: {
-      nodeIntegration: false,
+      contextIsolation: true,
     },
     width: 680,
     height: 340,

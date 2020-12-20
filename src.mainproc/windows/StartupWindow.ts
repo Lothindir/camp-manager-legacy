@@ -8,8 +8,9 @@ export default class StartupWindow{
         frame: false,
         title: 'Welcome to Camp Manager',
         webPreferences: {
-            nodeIntegration: false,
+            contextIsolation: false,
             preload: path.join(app.getAppPath(), 'src.preload/preload.js'),
+            enableRemoteModule: true,
         },
         width: 800,
         height: 600,

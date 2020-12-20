@@ -10,8 +10,9 @@ export default class MainWindow{
         width: 1200,
         height: 875,
         webPreferences: {
-            nodeIntegration: false,
+            contextIsolation: false,
             preload: path.join(app.getAppPath(), 'src.preload/preload.js'),
+            enableRemoteModule: true,
         },
         show: false
     }
