@@ -15,9 +15,9 @@ const router = new Router({
             component: Welcome,
         },
         {
-            path: '/config',
-            name: 'config',
-            component: () => import(/* webpackChunkName: "config" */ '@/views/startup/Config.vue'),
+            path: '/new',
+            name: 'newCamp',
+            component: () => import(/* webpackChunkName: "newCamp" */ '@/views/startup/NewCamp.vue'),
         },
     ],
 });

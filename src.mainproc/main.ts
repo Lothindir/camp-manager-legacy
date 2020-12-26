@@ -10,7 +10,8 @@ import MainWindow from './windows/MainWindow';
 
 // IPC events
 
-import './ipc/app';
+import './ipc/main';
+import './ipc/startup';
 
 // Constants
 
@@ -33,7 +34,7 @@ export default class Main {
         Main.application.on('ready', Main.onReady);
         Main.application.on('activate', Main.onActivate);
 
-        ipcMain.on('createMainWindow', () => {
+        ipcMain.on('app:create-main-window', () => {
             Main.startupWindow.window.hide();
             Main.splashWindow = new SplashWindow();
             Main.startupWindow.window.close();
@@ -67,7 +68,7 @@ export default class Main {
         let startupWindow = new StartupWindow()
 
         startupWindow.window.once('ready-to-show', () => {
-            console.log('[Startup} Closing splashscreen');
+            console.log('[Startup] Closing splashscreen');
             Main.splashWindow.close(startupWindow.window);
         });
 

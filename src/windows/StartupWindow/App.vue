@@ -5,32 +5,28 @@
     class="flex h-screen bg-gray-900 select-none pt-8 border border-black overflow-hidden font-quicksand"
   >
     <Titlebar title="Welcome to Camp Manager" :resizable="false"></Titlebar>
-    <button class="px-4" @click="openMain">Open Main</button>
-    <!--<router-link to="/">Welcome</router-link>
-    <router-link to="/config">Config</router-link>-->
     <router-view />
   </div>
 </template>
 
 <script lang="ts">
-import { Vue, Component } from "vue-property-decorator";
-import Titlebar from "@/components/Titlebar.vue";
-import { IpcRenderer } from "electron";
+import { Vue, Component } from 'vue-property-decorator';
+import Titlebar from '@/components/Titlebar.vue';
+import { IpcRenderer } from 'electron';
 declare var ipcRenderer: IpcRenderer;
 
 @Component({
   components: {
-    Titlebar
-  }
+    Titlebar,
+  },
 })
 export default class App extends Vue {
-  openMain() {
-    ipcRenderer.send("createMainWindow");
+  public openMain() {
+    ipcRenderer.send('createMainWindow');
   }
-  created() {
+  public created() {
     this.$router.onReady(() => {
-      console.log(this.$router.currentRoute);
-      if (this.$route.path.match(".*.html$")) {
+      if (this.$route.path.match('.*.html$')) {
         this.$router.replace('/');
       }
     });

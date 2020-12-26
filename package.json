@@ -5,9 +5,7 @@
   "description": "A camp manager made with Vue.js, Electron & TailwindCSS",
   "author": "Francesco Monti",
   "scripts": {
-    "serve": "vue-cli-service serve",
     "build": "vue-cli-service build",
-    "test:unit": "vue-cli-service test:unit",
     "lint": "vue-cli-service lint",
     "build:dev": "vue-cli-service build --mode development",
     "build:mainproc": "webpack-cli --mode=development --config webpack.mainproc.config.js",
@@ -52,7 +50,6 @@
     "source-map-loader": "^1.1.3",
     "typescript": "^4.1.3",
     "vue-cli-plugin-tailwind": "~1.4.2",
-    "vue-svgicon": "^3.2.9",
     "vue-template-compiler": "^2.6.12",
     "webpack-cli": "^3.3.12"
   },
