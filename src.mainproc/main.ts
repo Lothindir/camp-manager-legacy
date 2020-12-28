@@ -71,6 +71,13 @@ export default class Main {
         startupWindow.window.once('ready-to-show', () => {
             console.log('[Startup] Closing splashscreen');
             Main.splashWindow.close(startupWindow.window);
+
+            // Prevent reloading of the page
+            startupWindow.window.webContents.on("before-input-event", (event, input) => {
+                if(input.control && input.key.toLowerCase() == 'r'){
+                    event.preventDefault();
+                }
+            })
         });
 
         startupWindow.window.on('closed', () => {
