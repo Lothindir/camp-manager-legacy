@@ -3,9 +3,12 @@ import App from './App.vue';
 import router from './router';
 import SvgIcon from 'vue-svgicon';
 
+
+
 import 'typeface-quicksand';
 
 Vue.config.productionTip = false;
+Vue.config.devtools = true;
 
 Vue.use(SvgIcon, {
     tagName: 'svgicon',

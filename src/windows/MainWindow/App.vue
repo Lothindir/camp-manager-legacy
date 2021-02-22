@@ -2,11 +2,11 @@
   <div
     id="app"
     style="animation: fadein 0.5s;"
-    class="flex h-screen bg-gray-900 select-none pt-8 border border-black overflow-hidden font-quicksand"
+    class="flex h-screen pt-8 overflow-hidden bg-gray-900 border border-black select-none font-quicksand"
   >
     <Titlebar></Titlebar>
     <Sidebar></Sidebar>
-    <router-view class="ml-12 pl-2" />
+    <router-view class="pl-2 ml-12" />
   </div>
 </template>
 

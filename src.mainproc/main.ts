@@ -4,6 +4,9 @@ import * as url from 'url';
 import * as path from 'path';
 import { app, protocol, ipcMain, globalShortcut } from 'electron';
 
+// Devtools
+import installExtension, { VUEJS_DEVTOOLS, REDUX_DEVTOOLS } from 'electron-devtools-installer';
+
 import SplashWindow from './windows/SplashWindow';
 import GenericWindow from './windows/GenericWindow';
 
@@ -39,11 +42,18 @@ export default class Main {
         })
     }
 
-    private static onReady() {
+    private static async onReady() {
         Main.interceptFileProtocol();
 
+        
         Main.splashWindow = new SplashWindow()
         Main.createStartupWindow();
+        
+        if (process.env.NODE_ENV !== 'production') {            
+            installExtension(VUEJS_DEVTOOLS)
+                .then((name: any) => console.log(`Added Extension:  ${name}`))
+                .catch((err: any) => console.log('An error occurred: ', err));
+        }
     }
 
     private static onActivate() {
@@ -62,7 +72,7 @@ export default class Main {
     }
 
     private static createStartupWindow() {
-        let startupWindow = new GenericWindow('dist/startup-window.html',{
+        let startupWindow = new GenericWindow('dist/startup-window.html', {
             title: "Welcome to Camp Manager",
             width: 800,
             height: 600
@@ -74,10 +84,10 @@ export default class Main {
 
             // Prevent reloading of the page
             startupWindow.window.webContents.on("before-input-event", (event, input) => {
-                if(input.control && input.key.toLowerCase() == 'r'){
+                if (input.control && input.key.toLowerCase() == 'r') {
                     event.preventDefault();
                 }
-            })
+            });
         });
 
         startupWindow.window.on('closed', () => {
@@ -127,4 +137,4 @@ export default class Main {
     }
 }
 
-Main.main(app/*, BrowserWindow*/);
+Main.main(app);

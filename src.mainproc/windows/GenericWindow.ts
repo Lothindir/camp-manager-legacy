@@ -24,9 +24,7 @@ export default class GenericWindow {
     }
 
     protected createWindow(options?: Electron.BrowserWindowConstructorOptions) {
-        this.window = new BrowserWindow({...this.windowOptions, ...options});
-        console.log({...this.windowOptions, ...options});
-        
+        this.window = new BrowserWindow({...this.windowOptions, ...options});        
     }
 
     protected loadWindow(pagePath: string) {
