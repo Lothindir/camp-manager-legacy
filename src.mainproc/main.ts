@@ -50,7 +50,7 @@ export default class Main {
         Main.createStartupWindow();
         
         if (process.env.NODE_ENV !== 'production') {            
-            installExtension(VUEJS_DEVTOOLS)
+            installExtension(VUEJS_DEVTOOLS, { loadExtensionOptions : { allowFileAccess : true}})
                 .then((name: any) => console.log(`Added Extension:  ${name}`))
                 .catch((err: any) => console.log('An error occurred: ', err));
         }
