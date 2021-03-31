@@ -43,6 +43,8 @@ ipcMain.on('startup:open-recent-camp', (event: IpcMainEvent, args: any) => {
  */
 ipcMain.on('startup:get-home-folder', (event: IpcMainEvent, args: any) => {
   ipcMain.emit('app:get-home-folder', homedir());
+  console.log(homedir());
+  
 })
 
 /**
@@ -55,6 +57,8 @@ ipcMain.on('startup:new-camp-location', (event: IpcMainEvent, args: any) => {
   });
 
   if (filePath !== undefined) {
-    ipcMain.emit("app:new-camp-location", filePath);
+    ipcMain.emit('app:new-camp-location', filePath);
+    console.log(filePath);
+    
   }
 })

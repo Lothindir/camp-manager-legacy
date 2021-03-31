@@ -3,13 +3,30 @@
     <h1 class="mb-8 text-3xl">New Camp</h1>
     <div class="input-group">
       <label for="campName" class="input-label">Name : </label>
-      <input v-model="campName" class="w-2/3 input-text" type="text" name="campName" id="campName" />
+      <input
+        v-model="campName"
+        class="w-2/3 input-text"
+        type="text"
+        name="campName"
+        id="campName"
+      />
     </div>
     <div class="input-group">
       <label for="campLocation" class="input-label">Location : </label>
       <div class="flex w-2/3">
-        <input v-model="campLocationFolder" class="w-full input-text" type="text" name="campLocation" id="campLocation" />
-        <svgicon @click="openLocation" icon="zondicons/folder-outline" color="#edf2f7" class="h-8 ml-2"></svgicon>
+        <input
+          v-model="campLocationFolder"
+          class="w-full input-text"
+          type="text"
+          name="campLocation"
+          id="campLocation"
+        />
+        <svgicon
+          @click="openLocation"
+          icon="zondicons/folder-outline"
+          color="#edf2f7"
+          class="h-8 ml-2"
+        ></svgicon>
       </div>
     </div>
   </div>
@@ -22,28 +39,34 @@ declare var ipcRenderer: IpcRenderer;
 
 @Component
 export default class NewCamp extends Vue {
-  public created() {
-    ipcRenderer.on('app:get-home-folder', (e, args) => {
-      this.campLocationFolder = args[0];
-    })
-    ipcRenderer.on('app:new-camp-location', (e, args) => {
+  public mounted() {
+    this.$nextTick(function () {
+      ipcRenderer.on("app:get-home-folder", (e, args) => {
+        console.log('app:get-home-folder');
+        this.$store.dispatch('changeLocation', args[0]);
+      });
+
+      ipcRenderer.on("app:new-camp-location", (e, args) => {
+        this.$store.dispatch('changeLocation', args[0]);
+      });
+
+      ipcRenderer.send("startup:get-home-folder");
+
+      console.log(ipcRenderer);
       
     });
-
-    ipcRenderer.send('startup:get-home-folder');
-
   }
 
   campName: string = "Camp name";
-  campLocationFolder: string = "";
+  campLocationFolder: string = this.$store.getters.campLocation;
   get campLocation() {
-    return this.campLocationFolder + '/' + this.campName;
+    return this.campLocationFolder + "/" + this.campName;
   }
 
   openLocation() {
-    ipcRenderer.send('startup:new-camp-location');
+    ipcRenderer.send("startup:new-camp-location");
   }
-};
+}
 </script>
 
 <style>

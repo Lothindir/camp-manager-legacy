@@ -11,7 +11,7 @@ export default class GenericWindow {
         webPreferences: {
             contextIsolation: false,
             preload: path.join(app.getAppPath(), 'src.preload/preload.js'),
-            enableRemoteModule: true,
+            enableRemoteModule: false,
         },
         frame: false,
         show: false
