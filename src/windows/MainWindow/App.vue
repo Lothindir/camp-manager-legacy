@@ -14,6 +14,7 @@
 import { Vue, Component } from 'vue-property-decorator';
 import Titlebar from '@/components/Titlebar.vue';
 import Sidebar from '@/components/Sidebar.vue';
+import { ipcRenderer } from 'electron';
 
 @Component({
   components: {
@@ -21,7 +22,23 @@ import Sidebar from '@/components/Sidebar.vue';
     Sidebar,
   },
 })
-export default class App extends Vue {}
+export default class App extends Vue {
+  title: string = "Camp Manager";
+  path: string = "";
+
+  public created() {
+    ipcRenderer.on('main:get-camp-title', (e, args) => {
+      this.title += " - " + args;
+    });
+
+    ipcRenderer.on('main:get-camp-path', (e, args) => {
+      this.path = args;
+      ipcRenderer.send('main:get-camp-title');
+    });
+
+    ipcRenderer.send('main:get-camp-path');
+  }
+}
 </script>
 
 <style src="../../assets/main.css"></style>
