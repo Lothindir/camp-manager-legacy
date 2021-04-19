@@ -1,10 +1,11 @@
 
-import { ipcMain } from 'electron';
+/**
+ * IPC Events for the main window
+ */
 
-ipcMain.on('main:create-main-window', (event: any, arg: any) => {
+ import { ipcMain } from 'electron';
 
-});
-
-// ipcMain.on('app:awesome-sub-module:message-foo', (event: any, arg: any) => {
-//     //
-// });
+ // Args represents the path of the json file to save the camp to
+ipcMain.on('main:export-camp', (e, args) => {
+    
+})

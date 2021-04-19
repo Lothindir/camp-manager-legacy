@@ -22,8 +22,20 @@ ipcMain.on('startup:open-camp', (event: IpcMainEvent, args: any) => {
 
   if (filePath !== undefined) {
     // TODO Open camp with filePath
-    ipcMain.emit('app:create-main-window');
+    ipcMain.emit('app:create-main-window', filePath);
   }
+});
+
+/**
+ * Get recent projects
+ */
+ipcMain.on('startup:get-recent-projects', (event: IpcMainEvent, args: any) => {
+  // TODO get recent projects from somewhere
+  let recentProjects: string[][] = [
+    ['Camp 2B 2020', 'E:\\Documents\\Scouts\\Camps\\2020\\camp-2b-2020'],
+    ['Camp 2B 2021', 'E:\\Documents\\Scouts\\Camps\\2021\\camp-2b-2021']
+  ];
+  event.reply('startup:get-recent-projects', recentProjects);
 });
 
 /**
@@ -34,7 +46,7 @@ ipcMain.on('startup:open-recent-camp', (event: IpcMainEvent, args: any) => {
 
   if (filePath !== undefined) {
     // TODO Open camp with filePath
-    ipcMain.emit('app:create-main-window');
+    ipcMain.emit('app:create-main-window', filePath);
   }
 })
 
