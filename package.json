@@ -30,7 +30,7 @@
     "@fullcalendar/vue": "^4.2.2",
     "core-js": "^2.6.5",
     "lodash.clonedeep": "^4.5.0",
-    "moment": "^2.24.0",
+    "moment": "^2.29.4",
     "nedb": "^1.8.0",
     "vue": "^2.6.14",
     "vue-multiselect": "^2.1.6",
