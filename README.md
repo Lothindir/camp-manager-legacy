@@ -1,6 +1,9 @@
 # Camp Manager
 This project aims to create a utility app to manage scout camps, it's made with Vue.js, Electron and TailwindCSS.
 
+## Warning!
+This project is now on hold, I plan to get back to it and work on it as a thesis project. For now the project will be frozen and prepared for its next stage.
+
 ##### This is currently a WIP. Not all the features are going to work perfectly and you have to expect a lot of bugs. Don't hesitate to report the issues.
 
 Build | Coverage | Dependencies
